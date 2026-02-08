@@ -19,6 +19,8 @@ type TimelineEntry = {
   organization: string;
   location?: string;
   logo?: string;
+  logoDark?: string;
+  logoLight?: string;
   website?: string;
   roles: RoleEntry[];
 };
@@ -113,7 +115,8 @@ const timelines: Record<TimelineCategory, TimelineEntry[]> = {
     {
       organization: "Cyber Engineering McGill",
       location: "Montreal, QC",
-      logo: "/logo/cyberengmcgill.png",
+      logoDark: "/logo/cyberengmcgill.png",
+      logoLight: "/logo/cyberengmcgill_black.png",
       website: "https://cyberengineeringmcgill.club",
       roles: [
         {
@@ -513,10 +516,14 @@ function App() {
               <article key={`${activeTimeline}-${entry.organization}`}>
                 <header>
                   <div className="entry-head-main">
-                    {entry.logo ? (
+                    {entry.logo || entry.logoDark || entry.logoLight ? (
                       <span className="entry-logo" aria-hidden="true">
                         <img
-                          src={entry.logo}
+                          src={
+                            themeMode === "light"
+                              ? (entry.logoLight ?? entry.logoDark ?? entry.logo)
+                              : (entry.logoDark ?? entry.logoLight ?? entry.logo)
+                          }
                           alt={`${entry.organization} logo`}
                         />
                       </span>
