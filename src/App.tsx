@@ -5,6 +5,7 @@ import { TopNav } from "./components/TopNav";
 import { IntroSection } from "./components/IntroSection";
 import { ExperienceSection } from "./components/ExperienceSection";
 import { ContactSection } from "./components/ContactSection";
+import ClickSpark from "./components/ClickSpark";
 import { sectionOrder, timelineCategories } from "./data/website";
 import { getInitialThemeMode, prefersReducedMotion } from "./utils/theme";
 import type { SectionId, ThemeMode, TimelineCategory } from "./types/website";
@@ -163,35 +164,41 @@ function App() {
   };
 
   return (
-    <div className="site-shell">
-      <TopNav
-        activeSection={activeSection}
-        themeMode={themeMode}
-        onNavClick={onNavClick}
-        onThemeToggle={() =>
-          setThemeMode((previous) => (previous === "dark" ? "light" : "dark"))
-        }
-      />
-
-      <main>
-        <IntroSection />
-
-        <div className="section-divider" aria-hidden="true" />
-
-        <ExperienceSection
-          activeTimeline={activeTimeline}
+    <ClickSpark
+      sparkColor={themeMode === "dark" ? "#d3d9e1" : "#3d4a5b"}
+      disabled={prefersReducedMotion()}
+      ignoreSelector=".floating-nav .section-nav-item a"
+    >
+      <div className="site-shell">
+        <TopNav
+          activeSection={activeSection}
           themeMode={themeMode}
-          onActivateTimeline={activateTimeline}
-          onTimelineSwitcherKeyDown={onTimelineSwitcherKeyDown}
-          onExperienceTouchStart={onExperienceTouchStart}
-          onExperienceTouchEnd={onExperienceTouchEnd}
+          onNavClick={onNavClick}
+          onThemeToggle={() =>
+            setThemeMode((previous) => (previous === "dark" ? "light" : "dark"))
+          }
         />
 
-        <div className="section-divider" aria-hidden="true" />
+        <main>
+          <IntroSection />
 
-        <ContactSection emailCopied={emailCopied} onEmailCopy={onEmailCopy} />
-      </main>
-    </div>
+          <div className="section-divider" aria-hidden="true" />
+
+          <ExperienceSection
+            activeTimeline={activeTimeline}
+            themeMode={themeMode}
+            onActivateTimeline={activateTimeline}
+            onTimelineSwitcherKeyDown={onTimelineSwitcherKeyDown}
+            onExperienceTouchStart={onExperienceTouchStart}
+            onExperienceTouchEnd={onExperienceTouchEnd}
+          />
+
+          <div className="section-divider" aria-hidden="true" />
+
+          <ContactSection emailCopied={emailCopied} onEmailCopy={onEmailCopy} />
+        </main>
+      </div>
+    </ClickSpark>
   );
 }
 
