@@ -270,6 +270,11 @@ h3 {
   gap: 0.8rem;
 }
 
+.experience-list-shell {
+  overflow: hidden;
+  transition: height 180ms ease;
+}
+
 .experience-list article {
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -502,7 +507,8 @@ h3 {
   .theme-toggle,
   .contact-item,
   .timeline-switcher button,
-  .experience-list article {
+  .experience-list article,
+  .experience-list-shell {
     transition: none;
   }
 }
