@@ -77,7 +77,11 @@ const timelines: Record<TimelineCategory, TimelineEntry[]> = {
       website: "https://www.shopify.com",
       roles: [
         {
-          title: "Software Engineer Intern - Core, Checkout Customizations",
+          title: "Applied Machine Learning Engineering Intern",
+          dates: "Incoming Summer 2026",
+        },
+        {
+          title: "Software Engineering Intern - Core, Checkout Customizations",
           dates: "May 2025 - Aug 2025",
         },
       ],
@@ -521,8 +525,12 @@ function App() {
                         <img
                           src={
                             themeMode === "light"
-                              ? (entry.logoLight ?? entry.logoDark ?? entry.logo)
-                              : (entry.logoDark ?? entry.logoLight ?? entry.logo)
+                              ? (entry.logoLight ??
+                                entry.logoDark ??
+                                entry.logo)
+                              : (entry.logoDark ??
+                                entry.logoLight ??
+                                entry.logo)
                           }
                           alt={`${entry.organization} logo`}
                         />

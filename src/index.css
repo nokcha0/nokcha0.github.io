@@ -6,6 +6,7 @@
   --text: #e8eaed;
   --text-soft: #c8ccd2;
   --text-muted: #9ea4ad;
+  --date-text: #9a9fa8;
   --border: rgb(222 226 232 / 15%);
   --accent: #c7ccd4;
   --section-offset: 6.2rem;
@@ -28,6 +29,7 @@
   --text: #101317;
   --text-soft: #2f3742;
   --text-muted: #5f6977;
+  --date-text: #4f5661;
   --border: rgb(21 27 37 / 16%);
   --accent: #38404d;
 
