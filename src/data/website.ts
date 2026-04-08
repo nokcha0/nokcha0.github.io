@@ -71,7 +71,7 @@ export const timelines: Record<TimelineCategory, TimelineEntry[]> = {
       website: "https://www.shopify.com",
       roles: [
         {
-          title: "Applied Machine Learning Engineering Intern",
+          title: "Software Engineering Intern - Analytics",
           dates: "Incoming Summer 2026",
         },
         {
