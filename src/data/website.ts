@@ -130,6 +130,19 @@ export const timelines: Record<TimelineCategory, TimelineEntry[]> = {
   ],
   affiliation: [
     {
+      organization: "Innovation, Science and Economic Development Canada",
+      location: "Montreal, QC",
+      logo: "/logo/Flag_of_Canada.png",
+      website:
+        "https://apc-cap.ic.gc.ca/pls/apc_anon/query_amat_cs$callsign.QueryViewByKey?P_CALLSIGN=VA2JHC&Z_CHK=54431",
+      roles: [
+        {
+          title: "HAM Radio Operator (Call Sign: VA2JHC)",
+          dates: "May 2025 - Present",
+        },
+      ],
+    },
+    {
       organization: "Jewish General Hospital",
       location: "Montreal, QC",
       logo: "/logo/JGH.png",
@@ -138,6 +151,18 @@ export const timelines: Record<TimelineCategory, TimelineEntry[]> = {
         {
           title: "Volunteer for the Hospital Elder Life Program",
           dates: "June 2023 - Present",
+        },
+      ],
+    },
+    {
+      organization: "NAUI",
+      location: "Jeju, South Korea",
+      logo: "/logo/NAUI.png",
+      website: "https://www.naui.org/",
+      roles: [
+        {
+          title: "Open Water Scuba Diver (#6F54927)",
+          dates: "July 2022 - Present",
         },
       ],
     },
