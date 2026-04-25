@@ -130,7 +130,9 @@ export function ExperienceSection({
                     rel="noreferrer"
                     aria-label={`${entry.organization} website`}
                   >
-                    <ExternalLinkIcon />
+                    <span className="entry-site-icon" aria-hidden="true">
+                      <ExternalLinkIcon />
+                    </span>
                   </a>
                 ) : null}
               </header>

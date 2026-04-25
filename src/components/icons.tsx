@@ -40,10 +40,9 @@ export function ContactIcon({ label }: ContactIconProps) {
 export function ExternalLinkIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M8 16 16 8" />
-      <path d="M10 8h6v6" />
-      <path d="M14 5h4v4" />
-      <path d="M6 10v8h8" />
+      <path d="M10 14 18 6" />
+      <path d="M13 6h5v5" />
+      <path d="M18 13v4a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4" />
     </svg>
   );
 }

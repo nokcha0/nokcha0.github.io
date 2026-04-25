@@ -10,9 +10,10 @@
   --border: rgb(222 226 232 / 15%);
   --accent: #c7ccd4;
   --section-offset: 6.2rem;
+  --font-sans: "Red Hat Display", "Avenir Next", "Segoe UI", sans-serif;
 
   color-scheme: dark;
-  font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;

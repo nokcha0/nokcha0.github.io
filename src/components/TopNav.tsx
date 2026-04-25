@@ -32,7 +32,7 @@ export function TopNav({
               </a>
             </li>
           ))}
-          <li className="theme-toggle-item">
+          <li className="theme-toggle-item nav-control-item">
             <button
               type="button"
               className="theme-toggle"

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap");
 
 #root {
   min-height: 100vh;
@@ -12,6 +12,8 @@
 }
 
 .floating-nav {
+  --nav-gap: 0.38rem;
+  --nav-control-gap: 0.72rem;
   position: fixed;
   top: 1rem;
   left: 50%;
@@ -29,7 +31,7 @@
   display: flex;
   align-items: center;
   list-style: none;
-  gap: 0.38rem;
+  gap: var(--nav-gap);
 }
 
 .section-nav-item + .section-nav-item {
@@ -39,11 +41,26 @@
 .section-nav-item + .section-nav-item::before {
   content: "";
   position: absolute;
-  left: -0.21rem;
+  left: calc(var(--nav-gap) / -2);
   top: 50%;
   width: 1px;
   height: 0.95rem;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
+  background: var(--border);
+}
+
+.nav-control-item {
+  position: relative;
+}
+
+.nav-control-item::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--nav-control-gap) / -2);
+  top: 50%;
+  width: 1px;
+  height: 0.95rem;
+  transform: translate(-50%, -50%);
   background: var(--border);
 }
 
@@ -75,9 +92,8 @@
 }
 
 .theme-toggle-item {
-  margin-left: 0.15rem;
+  margin-left: calc(var(--nav-control-gap) - var(--nav-gap));
 }
-
 .theme-toggle {
   min-height: 2rem;
   width: 2rem;
@@ -96,6 +112,12 @@
     background-color 160ms ease;
 }
 
+.theme-toggle-icon {
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+}
+
 .theme-toggle:hover {
   color: var(--text);
   border-color: rgb(224 229 238 / 36%);
@@ -105,12 +127,6 @@
 .theme-toggle:focus-visible {
   outline: 2px solid rgb(208 213 221 / 70%);
   outline-offset: 2px;
-}
-
-.theme-toggle-icon {
-  display: inline-flex;
-  width: 1rem;
-  height: 1rem;
 }
 
 .theme-toggle-icon svg {
@@ -335,14 +351,15 @@ h3 {
 }
 
 .entry-site {
-  width: 1.95rem;
-  height: 1.95rem;
-  flex: 0 0 1.95rem;
+  width: 2.05rem;
+  height: 2.05rem;
+  flex: 0 0 2.05rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: 8px;
+  padding: 0;
   color: var(--text-soft);
   background: var(--surface);
   text-decoration: none;
@@ -352,12 +369,20 @@ h3 {
     background-color 160ms ease;
 }
 
-.entry-site svg {
-  width: 0.95rem;
-  height: 0.95rem;
+.entry-site-icon {
+  width: 1.45rem;
+  height: 1.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.entry-site-icon svg {
+  width: 0.84rem;
+  height: 0.84rem;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: 1.9;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
