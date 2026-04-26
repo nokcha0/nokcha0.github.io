@@ -55,7 +55,13 @@ function InlineNote({ label, tooltip, keyPrefix }: InlineNoteProps) {
     setIsSuppressed(false);
   };
 
-  const onTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+  const onTriggerKeyDown = (event: KeyboardEvent<HTMLSpanElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleTooltip();
+      return;
+    }
+
     if (event.key !== "Escape") return;
 
     event.preventDefault();
@@ -77,9 +83,10 @@ function InlineNote({ label, tooltip, keyPrefix }: InlineNoteProps) {
       onFocusCapture={() => setHasFocusWithin(true)}
       onBlurCapture={onBlurCapture}
     >
-      <button
-        type="button"
+      <span
         className="inline-note-trigger"
+        role="button"
+        tabIndex={0}
         onClick={toggleTooltip}
         onKeyDown={onTriggerKeyDown}
         aria-describedby={tooltipId}
@@ -88,7 +95,7 @@ function InlineNote({ label, tooltip, keyPrefix }: InlineNoteProps) {
         <span className="inline-note-label">
           {renderSegments(label, `${keyPrefix}-label`)}
         </span>
-      </button>
+      </span>
       <span id={tooltipId} className="inline-note-bubble" role="tooltip">
         {renderSegments(tooltip, `${keyPrefix}-text`)}
       </span>

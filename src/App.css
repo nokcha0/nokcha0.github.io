@@ -205,22 +205,26 @@ h3 {
   color: var(--text-soft);
   font-size: 1.06rem;
   line-height: 1.72;
-  text-align: left;
+  text-align: justify;
+  text-justify: inter-word;
   text-wrap: pretty;
 }
 
 .inline-note {
   position: relative;
-  display: inline-block;
+  display: inline;
 }
 
 .inline-note-trigger {
+  display: inline;
   color: inherit;
   border: 0;
   padding: 0;
   background: transparent;
   font: inherit;
   line-height: inherit;
+  white-space: inherit;
+  overflow-wrap: anywhere;
   cursor: help;
   text-decoration: underline;
   text-decoration-color: var(--text-muted);
