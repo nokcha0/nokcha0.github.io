@@ -11,38 +11,49 @@ export function ContactSection({ emailCopied, onEmailCopy }: ContactSectionProps
     <section id="contact" className="section">
       <h2>Contact</h2>
       <p className="summary">Feel free to say hello!</p>
-      <ul className="contact-list">
-        {contactLinks.map((link) => (
-          <li key={link.label}>
-            {link.label === "Email" ? (
-              <button
-                type="button"
-                className={`contact-item ${emailCopied ? "is-copied" : ""}`}
-                onClick={() => onEmailCopy(link.value)}
-                aria-live="polite"
-              >
-                <span className="contact-main">
-                  <span className="contact-icon">
-                    <ContactIcon label={link.label} />
+      <div className="contact-table-shell">
+        <table className="contact-table">
+          <tbody>
+            {contactLinks.map((link) => (
+              <tr key={link.label}>
+                <th scope="row" className="contact-label-cell">
+                  <span className="contact-main">
+                    <span className="contact-icon">
+                      <ContactIcon label={link.label} />
+                    </span>
+                    <span>{link.label}</span>
                   </span>
-                  <span>{link.label}</span>
-                </span>
-                <span className="contact-value">{emailCopied ? "Copied" : link.value}</span>
-              </button>
-            ) : (
-              <a className="contact-item" href={link.href} target="_blank" rel="noreferrer">
-                <span className="contact-main">
-                  <span className="contact-icon">
-                    <ContactIcon label={link.label} />
-                  </span>
-                  <span>{link.label}</span>
-                </span>
-                <span className="contact-value">{link.value}</span>
-              </a>
-            )}
-          </li>
-        ))}
-      </ul>
+                </th>
+                <td className="contact-value-cell">
+                  {link.label === "Email" ? (
+                    <button
+                      type="button"
+                      className={`contact-action ${emailCopied ? "is-copied" : ""}`}
+                      onClick={() => onEmailCopy(link.value)}
+                      aria-live="polite"
+                    >
+                      <span className="contact-value">{link.value}</span>
+                      <span className="contact-status">
+                        {emailCopied ? "Copied" : "Copy"}
+                      </span>
+                    </button>
+                  ) : (
+                    <a
+                      className="contact-action"
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <span className="contact-value">{link.value}</span>
+                      <span className="contact-status">Open</span>
+                    </a>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

@@ -320,7 +320,7 @@ h3 {
 .timeline-switcher {
   margin: 0 0 1rem;
   display: flex;
-  gap: 0.55rem;
+  gap: 1rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -331,29 +331,26 @@ h3 {
 }
 
 .timeline-switcher button {
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
   color: var(--text-muted);
-  border-radius: 8px;
   font: inherit;
-  font-size: 0.88rem;
-  padding: 0.45rem 0.8rem;
+  font-size: 0.95rem;
+  padding: 0.2rem 0 0.25rem;
   cursor: pointer;
   transition:
     border-color 160ms ease,
-    color 160ms ease,
-    background-color 160ms ease;
+    color 160ms ease;
 }
 
 .timeline-switcher button:hover {
   color: var(--text-soft);
-  border-color: var(--border-strong);
-  background: var(--surface-2);
 }
 
 .timeline-switcher button.is-active {
   color: var(--text);
-  border-color: var(--border-strong);
+  border-color: var(--text-muted);
 }
 
 .timeline-switcher button:focus-visible {
@@ -361,14 +358,26 @@ h3 {
   outline-offset: 2px;
 }
 
-.experience-list {
-  display: grid;
-  gap: 0.8rem;
-}
-
 .experience-list-shell {
   overflow: hidden;
   transition: height 180ms ease;
+}
+
+.contact-table-shell {
+  margin-top: 1.15rem;
+  overflow-x: auto;
+}
+
+.contact-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 0.94rem;
+}
+
+.experience-list {
+  display: grid;
+  gap: 0.8rem;
 }
 
 .experience-list article {
@@ -505,52 +514,46 @@ h3 {
   line-height: 1.4;
 }
 
-.contact-list {
-  margin: 1.2rem 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+.contact-table th,
+.contact-table td {
+  padding: 0.72rem 1rem 0.72rem 0;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.35;
+  border-bottom: 1px solid var(--border);
 }
 
-.contact-item {
+.contact-table th,
+.contact-table td {
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+}
+
+.contact-label-cell {
+  width: 9rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.contact-value-cell {
   width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.8rem 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 0;
-  gap: 0.9rem;
-  text-decoration: none;
-  background: var(--surface);
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition:
-    border-color 160ms ease,
-    background-color 160ms ease;
 }
 
 .contact-main {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  font-weight: 600;
+  gap: 0.55rem;
+  font-weight: 500;
   white-space: nowrap;
-  flex: 0 0 auto;
 }
 
 .contact-icon {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1rem;
+  height: 1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-soft);
+  color: var(--text-muted);
 }
 
 .contact-icon svg {
@@ -563,34 +566,47 @@ h3 {
   stroke-linejoin: round;
 }
 
-.contact-item:hover {
-  border: 1px solid var(--border);
-  border-color: var(--border-strong);
-  background: var(--surface-2);
+.contact-action {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
 }
 
-.contact-item:hover .contact-icon {
+.contact-action:hover .contact-value,
+.contact-action:hover .contact-status {
   color: var(--text);
 }
 
-.contact-item:focus-visible {
+.contact-action:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
-.contact-item.is-copied {
-  border-color: var(--copied-border);
-  background: var(--copied-bg);
+.contact-action.is-copied .contact-status {
+  color: var(--accent);
 }
 
 .contact-value {
   color: var(--text-soft);
-  font-size: 0.9rem;
-  line-height: 1.2;
+  font-size: 0.96rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.contact-status {
+  color: var(--text-muted);
+  font-size: 0.84rem;
   white-space: nowrap;
-  text-align: right;
-  flex: 1 1 auto;
-  min-width: 0;
 }
 
 @media (min-width: 740px) {
@@ -604,10 +620,6 @@ h3 {
 
   .experience-list article {
     padding: 1.3rem 1.25rem;
-  }
-
-  .contact-list {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -629,6 +641,19 @@ h3 {
   .floating-nav a {
     font-size: 1.04rem;
   }
+
+  .timeline-switcher {
+    gap: 0.8rem;
+  }
+
+  .contact-label-cell {
+    width: 7.2rem;
+  }
+
+  .contact-action {
+    gap: 0.7rem;
+    align-items: flex-start;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -636,7 +661,7 @@ h3 {
   .floating-nav .nav-home,
   .theme-toggle,
   .inline-note-bubble,
-  .contact-item,
+  .contact-action,
   .timeline-switcher button,
   .experience-list article,
   .experience-list-shell {

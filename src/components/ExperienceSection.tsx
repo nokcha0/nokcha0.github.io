@@ -70,6 +70,14 @@ export function ExperienceSection({
     previousListHeightRef.current = Math.ceil(listElement.getBoundingClientRect().height);
   });
 
+  const getLogoSource = (logoDark?: string, logoLight?: string, logo?: string) => {
+    if (themeMode === "light") {
+      return logoLight ?? logoDark ?? logo;
+    }
+
+    return logoDark ?? logoLight ?? logo;
+  };
+
   return (
     <section
       id="experience"
@@ -109,11 +117,11 @@ export function ExperienceSection({
                   {entry.logo || entry.logoDark || entry.logoLight ? (
                     <span className="entry-logo" aria-hidden="true">
                       <img
-                        src={
-                          themeMode === "light"
-                            ? (entry.logoLight ?? entry.logoDark ?? entry.logo)
-                            : (entry.logoDark ?? entry.logoLight ?? entry.logo)
-                        }
+                        src={getLogoSource(
+                          entry.logoDark,
+                          entry.logoLight,
+                          entry.logo,
+                        )}
                         alt={`${entry.organization} logo`}
                       />
                     </span>
