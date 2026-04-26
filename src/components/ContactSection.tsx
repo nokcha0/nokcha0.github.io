@@ -15,7 +15,7 @@ export function ContactSection({ emailCopied, onEmailCopy }: ContactSectionProps
         <table className="contact-table">
           <tbody>
             {contactLinks.map((link) => (
-              <tr key={link.label}>
+              <tr key={link.label} className="contact-row">
                 <th scope="row" className="contact-label-cell">
                   <span className="contact-main">
                     <span className="contact-icon">

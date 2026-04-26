@@ -184,6 +184,7 @@ h2 {
 h3 {
   margin: 0;
   font-size: 1.05rem;
+  line-height: 1.2;
 }
 
 .role {
@@ -211,7 +212,15 @@ h3 {
 .inline-note {
   position: relative;
   display: inline-block;
+}
+
+.inline-note-trigger {
   color: inherit;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  line-height: inherit;
   cursor: help;
   text-decoration: underline;
   text-decoration-color: var(--text-muted);
@@ -220,12 +229,13 @@ h3 {
   text-underline-offset: 0.16em;
 }
 
-.inline-note:hover,
-.inline-note:focus-visible {
+.inline-note.is-visible .inline-note-trigger,
+.inline-note-trigger:hover,
+.inline-note-trigger:focus-visible {
   color: var(--text);
 }
 
-.inline-note:focus-visible {
+.inline-note-trigger:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
   border-radius: 3px;
@@ -259,11 +269,10 @@ h3 {
     visibility 160ms ease;
 }
 
-.inline-note:hover .inline-note-bubble,
-.inline-note:focus .inline-note-bubble,
-.inline-note:focus-visible .inline-note-bubble {
+.inline-note.is-visible .inline-note-bubble {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
   transform: translateX(-50%) translateY(0);
 }
 
@@ -391,6 +400,14 @@ h3 {
   gap: 0.9rem;
 }
 
+.entry-head-main,
+.entry-head-main > div,
+.contact-label-cell,
+.contact-value-cell,
+.contact-action {
+  min-width: 0;
+}
+
 .experience-list article:hover {
   border-color: var(--border-strong);
   background: var(--surface);
@@ -431,6 +448,7 @@ h3 {
   margin: 0.4rem 0 0;
   color: var(--text-muted);
   font-size: 0.92rem;
+  overflow-wrap: anywhere;
 }
 
 .entry-site {
@@ -497,6 +515,7 @@ h3 {
   color: var(--text);
   font-size: 0.96rem;
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .meta-date {
@@ -594,6 +613,7 @@ h3 {
   color: var(--text-soft);
   font-size: 0.96rem;
   line-height: 1.35;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
@@ -786,16 +806,30 @@ h3 {
 
 @media (max-width: 640px) {
   .site-shell {
+    width: min(44rem, 100% - 1.25rem);
     padding-top: 2rem;
+    padding-bottom: 3rem;
   }
 
   .floating-nav {
-    gap: 0.75rem;
-    margin-bottom: 1.55rem;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .floating-nav nav {
+    width: 100%;
+    margin-left: 0;
+    overflow-x: visible;
+    padding-bottom: 0.1rem;
   }
 
   .floating-nav ul {
+    flex-wrap: wrap;
     gap: 0.75rem;
+    min-width: 0;
+    white-space: normal;
   }
 
   .floating-nav .nav-home,
@@ -803,17 +837,123 @@ h3 {
     font-size: 1.04rem;
   }
 
+  .section {
+    padding: 2.15rem 0 1.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 11vw, 2.9rem);
+  }
+
+  .summary,
+  .intro .summary {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .intro-contact-links {
+    flex-wrap: wrap;
+  }
+
+  .inline-note-bubble {
+    left: 0;
+    bottom: calc(100% + 0.55rem);
+    transform: translateY(0.2rem);
+    max-width: min(15rem, calc(100vw - 2rem));
+  }
+
+  .inline-note.is-visible .inline-note-bubble {
+    transform: translateY(0);
+  }
+
   .timeline-switcher {
+    flex-wrap: wrap;
     gap: 0.8rem;
+    overflow-x: visible;
+  }
+
+  .experience-list article {
+    padding: 1rem 0.9rem;
+    border-radius: 12px;
+  }
+
+  .experience-list header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+  }
+
+  .entry-head-main {
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  .entry-logo {
+    width: 56px;
+    height: 56px;
+    flex: 0 0 56px;
+  }
+
+  .role-list {
+    margin-top: 0.75rem;
+    gap: 0.55rem;
+  }
+
+  .role-list.is-multi {
+    padding-left: 0.75rem;
+  }
+
+  .meta-role {
+    font-size: 0.94rem;
+  }
+
+  .meta-date {
+    font-size: 0.84rem;
+  }
+
+  .contact-table-shell {
+    overflow: visible;
+  }
+
+  .contact-table,
+  .contact-table tbody,
+  .contact-row,
+  .contact-label-cell,
+  .contact-value-cell {
+    display: block;
+    width: 100%;
+  }
+
+  .contact-table th,
+  .contact-table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .contact-row {
+    display: grid;
+    gap: 0.42rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
   }
 
   .contact-label-cell {
-    width: 7.2rem;
+    width: 100%;
   }
 
   .contact-action {
-    gap: 0.7rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.28rem;
     align-items: flex-start;
+  }
+
+  .contact-main {
+    white-space: normal;
+  }
+
+  .contact-status {
+    justify-self: start;
   }
 
   .puzzle-toolbar {
@@ -826,6 +966,31 @@ h3 {
     width: 100%;
     justify-content: flex-start;
     flex-wrap: wrap;
+  }
+
+  .puzzle-board-shell {
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .floating-nav ul {
+    gap: 0.6rem;
+  }
+
+  .floating-nav .nav-home,
+  .floating-nav a {
+    font-size: 1rem;
+  }
+
+  .timeline-switcher button {
+    font-size: 0.92rem;
+  }
+
+  .puzzle-button {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
   }
 }
 

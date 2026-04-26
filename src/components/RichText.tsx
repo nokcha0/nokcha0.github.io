@@ -1,9 +1,100 @@
-import { Fragment } from "react";
-import type { ReactNode } from "react";
+import { Fragment, useEffect, useId, useRef, useState } from "react";
+import type { FocusEvent, KeyboardEvent, ReactNode } from "react";
 
 type RichTextProps = {
   text: string;
 };
+
+type InlineNoteProps = {
+  label: string;
+  tooltip: string;
+  keyPrefix: string;
+};
+
+function InlineNote({ label, tooltip, keyPrefix }: InlineNoteProps) {
+  const wrapperRef = useRef<HTMLSpanElement | null>(null);
+  const tooltipId = useId();
+  const [isHovered, setIsHovered] = useState(false);
+  const [hasFocusWithin, setHasFocusWithin] = useState(false);
+  const [isPinnedOpen, setIsPinnedOpen] = useState(false);
+  const [isSuppressed, setIsSuppressed] = useState(false);
+
+  const isVisible = isPinnedOpen || ((isHovered || hasFocusWithin) && !isSuppressed);
+
+  useEffect(() => {
+    if (!isPinnedOpen) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!wrapperRef.current?.contains(event.target as Node)) {
+        setIsPinnedOpen(false);
+        setIsSuppressed(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [isPinnedOpen]);
+
+  const toggleTooltip = () => {
+    if (isPinnedOpen) {
+      setIsPinnedOpen(false);
+      setIsSuppressed(true);
+      return;
+    }
+
+    setIsPinnedOpen(true);
+    setIsSuppressed(false);
+  };
+
+  const onBlurCapture = (event: FocusEvent<HTMLSpanElement>) => {
+    if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      return;
+    }
+
+    setHasFocusWithin(false);
+    setIsSuppressed(false);
+  };
+
+  const onTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key !== "Escape") return;
+
+    event.preventDefault();
+    setIsPinnedOpen(false);
+    setIsSuppressed(true);
+  };
+
+  return (
+    <span
+      ref={wrapperRef}
+      className={`inline-note ${isVisible ? "is-visible" : ""} ${
+        isPinnedOpen ? "is-open" : ""
+      }`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsSuppressed(false);
+      }}
+      onFocusCapture={() => setHasFocusWithin(true)}
+      onBlurCapture={onBlurCapture}
+    >
+      <button
+        type="button"
+        className="inline-note-trigger"
+        onClick={toggleTooltip}
+        onKeyDown={onTriggerKeyDown}
+        aria-describedby={tooltipId}
+        aria-expanded={isPinnedOpen}
+      >
+        <span className="inline-note-label">
+          {renderSegments(label, `${keyPrefix}-label`)}
+        </span>
+      </button>
+      <span id={tooltipId} className="inline-note-bubble" role="tooltip">
+        {renderSegments(tooltip, `${keyPrefix}-text`)}
+      </span>
+    </span>
+  );
+}
 
 function renderSegments(text: string, keyPrefix: string): ReactNode[] {
   const tokenPattern = /\[\[(.+?)\|(.+?)\]\]|\*\*(.+?)\*\*|\*(.+?)\*/g;
@@ -25,25 +116,12 @@ function renderSegments(text: string, keyPrefix: string): ReactNode[] {
 
     if (tooltipLabel !== undefined && tooltipText !== undefined) {
       nodes.push(
-        <span
+        <InlineNote
           key={`${keyPrefix}-tooltip-${matchCount}`}
-          className="inline-note"
-          tabIndex={0}
-          aria-label={`${tooltipLabel}: ${tooltipText}`}
-        >
-          <span className="inline-note-label">
-            {renderSegments(
-              tooltipLabel,
-              `${keyPrefix}-tooltip-label-${matchCount}`,
-            )}
-          </span>
-          <span className="inline-note-bubble" role="tooltip">
-            {renderSegments(
-              tooltipText,
-              `${keyPrefix}-tooltip-text-${matchCount}`,
-            )}
-          </span>
-        </span>,
+          label={tooltipLabel}
+          tooltip={tooltipText}
+          keyPrefix={`${keyPrefix}-tooltip-${matchCount}`}
+        />,
       );
     } else if (boldText !== undefined) {
       nodes.push(
