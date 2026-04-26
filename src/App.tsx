@@ -5,6 +5,7 @@ import { TopNav } from "./components/TopNav";
 import { IntroSection } from "./components/IntroSection";
 import { ExperienceSection } from "./components/ExperienceSection";
 import { ContactSection } from "./components/ContactSection";
+import { GameSection } from "./components/GameSection";
 import ClickSpark from "./components/ClickSpark";
 import { sectionOrder, timelineCategories } from "./data/website";
 import { getInitialThemeMode, prefersReducedMotion } from "./utils/theme";
@@ -167,7 +168,7 @@ function App() {
     <ClickSpark
       sparkColor={themeMode === "dark" ? "#cecdc3" : "#24837b"}
       disabled={prefersReducedMotion()}
-      ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle"
+      ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle, .puzzle-board, .puzzle-button"
     >
       <div className="site-shell">
         <TopNav
@@ -182,8 +183,6 @@ function App() {
         <main>
           <IntroSection />
 
-          <div className="section-divider" aria-hidden="true" />
-
           <ExperienceSection
             activeTimeline={activeTimeline}
             themeMode={themeMode}
@@ -193,9 +192,9 @@ function App() {
             onExperienceTouchEnd={onExperienceTouchEnd}
           />
 
-          <div className="section-divider" aria-hidden="true" />
-
           <ContactSection emailCopied={emailCopied} onEmailCopy={onEmailCopy} />
+
+          <GameSection />
         </main>
       </div>
     </ClickSpark>
