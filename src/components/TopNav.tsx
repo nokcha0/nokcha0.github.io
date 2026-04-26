@@ -18,6 +18,14 @@ export function TopNav({
 }: TopNavProps) {
   return (
     <header className="floating-nav" aria-label="Primary">
+      <a
+        href="#intro"
+        className="nav-home"
+        onClick={(event) => onNavClick(event, "intro")}
+        aria-label="Joonhyun Chang"
+      >
+        Joonhyun Chang
+      </a>
       <nav>
         <ul>
           {sectionOrder.map((sectionId) => (

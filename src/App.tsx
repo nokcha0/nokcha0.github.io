@@ -165,7 +165,7 @@ function App() {
 
   return (
     <ClickSpark
-      sparkColor={themeMode === "dark" ? "#d3d9e1" : "#3d4a5b"}
+      sparkColor={themeMode === "dark" ? "#cecdc3" : "#24837b"}
       disabled={prefersReducedMotion()}
       ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle"
     >

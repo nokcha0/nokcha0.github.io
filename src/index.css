@@ -1,16 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
 :root {
-  --bg: #000000;
-  --surface: #171a1f;
-  --surface-2: #1d2127;
-  --nav-bg: rgb(23 26 32 / 92%);
-  --text: #e8eaed;
-  --text-soft: #c8ccd2;
-  --text-muted: #9ea4ad;
-  --date-text: #9a9fa8;
-  --border: rgb(222 226 232 / 15%);
-  --accent: #c7ccd4;
-  --section-offset: 6.2rem;
-  --font-sans: "Red Hat Display", "Avenir Next", "Segoe UI", sans-serif;
+  --bg: #100f0f;
+  --surface: #1c1b1a;
+  --surface-2: #282726;
+  --nav-bg: rgb(28 27 26 / 90%);
+  --text: #f2f0e5;
+  --text-soft: #cecdc3;
+  --text-muted: #878580;
+  --date-text: #b7b5ac;
+  --border: rgb(87 86 83 / 48%);
+  --border-strong: rgb(159 157 150 / 44%);
+  --accent: #87d3c3;
+  --focus-ring: rgb(135 211 195 / 55%);
+  --selection: rgb(30 95 91 / 30%);
+  --highlight: #3a2d04;
+  --copied-border: rgb(58 169 159 / 38%);
+  --copied-bg: rgb(16 31 29 / 78%);
+  --section-offset: 1.8rem;
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "IBM Plex Sans", "Segoe UI",
+    Helvetica, Arial, sans-serif;
 
   color-scheme: dark;
   font-family: var(--font-sans);
@@ -23,16 +33,22 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #f5f6f8;
-  --surface: #ffffff;
-  --surface-2: #eef1f5;
-  --nav-bg: rgb(255 255 255 / 93%);
-  --text: #101317;
-  --text-soft: #2f3742;
-  --text-muted: #5f6977;
-  --date-text: #4f5661;
-  --border: rgb(21 27 37 / 16%);
-  --accent: #38404d;
+  --bg: #fffcf0;
+  --surface: #f2f0e5;
+  --surface-2: #e6e4d9;
+  --nav-bg: rgb(255 252 240 / 93%);
+  --text: #100f0f;
+  --text-soft: #282726;
+  --text-muted: #6f6e69;
+  --date-text: #575653;
+  --border: rgb(206 205 195 / 92%);
+  --border-strong: rgb(183 181 172 / 92%);
+  --accent: #24837b;
+  --focus-ring: rgb(36 131 123 / 36%);
+  --selection: rgb(187 220 206 / 32%);
+  --highlight: #f6e2a0;
+  --copied-border: rgb(58 169 159 / 28%);
+  --copied-bg: rgb(221 241 228 / 92%);
 
   color-scheme: light;
 }
@@ -41,6 +57,10 @@
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+*::selection {
+  background: var(--selection);
 }
 
 html,
@@ -52,5 +72,10 @@ body {
 
 body {
   background: var(--bg);
+  color: var(--text);
+}
+
+mark {
+  background: var(--highlight);
   color: var(--text);
 }

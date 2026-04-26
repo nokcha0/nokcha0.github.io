@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import type { KeyboardEvent, TouchEvent } from "react";
 import { timelineCategories, timelines } from "../data/website";
 import { ExternalLinkIcon } from "./icons";
+import { RichText } from "./RichText";
 import type { ThemeMode, TimelineCategory } from "../types/website";
 
 type ExperienceSectionProps = {
@@ -118,8 +119,14 @@ export function ExperienceSection({
                     </span>
                   ) : null}
                   <div>
-                    <h3>{entry.organization}</h3>
-                    {entry.location ? <p className="meta">{entry.location}</p> : null}
+                    <h3>
+                      <RichText text={entry.organization} />
+                    </h3>
+                    {entry.location ? (
+                      <p className="meta">
+                        <RichText text={entry.location} />
+                      </p>
+                    ) : null}
                   </div>
                 </div>
                 {entry.website ? (
@@ -145,8 +152,14 @@ export function ExperienceSection({
                       className="role-item"
                       key={`${role.title}-${role.dates ?? "no-date"}`}
                     >
-                      <p className="meta-role">{role.title}</p>
-                      {role.dates ? <p className="meta-date">{role.dates}</p> : null}
+                      <p className="meta-role">
+                        <RichText text={role.title} />
+                      </p>
+                      {role.dates ? (
+                        <p className="meta-date">
+                          <RichText text={role.dates} />
+                        </p>
+                      ) : null}
                     </div>
                   ))}
                 </div>
