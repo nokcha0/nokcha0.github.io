@@ -1,5 +1,10 @@
 import { Fragment, useEffect, useId, useRef, useState } from "react";
-import type { FocusEvent, KeyboardEvent, ReactNode } from "react";
+import type {
+  FocusEvent,
+  KeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+  ReactNode,
+} from "react";
 
 type RichTextProps = {
   text: string;
@@ -35,10 +40,13 @@ function InlineNote({ label, tooltip, keyPrefix }: InlineNoteProps) {
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [isPinnedOpen]);
 
-  const toggleTooltip = () => {
+  const toggleTooltip = (event?: ReactMouseEvent<HTMLSpanElement>) => {
     if (isPinnedOpen) {
       setIsPinnedOpen(false);
+      setIsHovered(false);
+      setHasFocusWithin(false);
       setIsSuppressed(true);
+      event?.currentTarget.blur();
       return;
     }
 
