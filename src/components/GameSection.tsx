@@ -30,6 +30,9 @@ const BOARD_SIZE = 360;
 const GRID_STEP = 70;
 const BOARD_OFFSET = 40;
 const DOT_RADIUS = 6;
+const VISIBLE_BOARD_PADDING = 22;
+const VISIBLE_BOARD_MIN = BOARD_OFFSET + GRID_STEP - VISIBLE_BOARD_PADDING;
+const VISIBLE_BOARD_SIZE = GRID_STEP * 2 + VISIBLE_BOARD_PADDING * 2;
 const VISIBLE_SNAP_RADIUS = 28;
 const HIDDEN_SNAP_RADIUS = 11;
 const CARRY_DOT_SNAP_RADIUS = 20;
@@ -408,13 +411,15 @@ export function GameSection() {
     <section className="section puzzle-section" aria-labelledby="puzzle-title">
       <h2 id="puzzle-title">Thanks for coming. A small game for you:</h2>
       <p className="puzzle-summary">
-        <RichText text="Can you cover all 9 dots with four [[consecutive|without lifting the pen.]] straight lines?" />
+        <span className="puzzle-summary-text">
+          <RichText text="Can you cover all 9 dots with four [[consecutive|without lifting the pen.]] straight lines?" />
+        </span>
+        <span className="puzzle-count" aria-live="polite">
+          {linesUsed} / {MAX_SEGMENTS}
+        </span>
       </p>
 
       <div className="puzzle-toolbar">
-        <p className="puzzle-count" aria-live="polite">
-          {linesUsed} / {MAX_SEGMENTS}
-        </p>
         <div className="puzzle-actions">
           <button type="button" className="puzzle-button" onClick={resetGame}>
             Reset
@@ -427,36 +432,45 @@ export function GameSection() {
           >
             See solution
           </button>
-        </div>
-      </div>
-
-      {solutionStep > 0 ? (
-        <div className="puzzle-confirmation" role="dialog" aria-modal="false">
-          <p className="puzzle-confirmation-text">
-            {solutionStep === 1
-              ? "Are you sure?"
-              : solutionStep === 2
-                ? "Really sure? Hint: Think outside the box!"
-                : "Last chance."}
-          </p>
-          <div className="puzzle-confirmation-actions">
-            <button
-              type="button"
-              className="puzzle-button"
-              onClick={cancelSolutionFlow}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="puzzle-button"
-              onClick={advanceSolutionFlow}
-            >
-              {solutionStep === 3 ? "Show solution" : "Continue"}
-            </button>
+          <div
+            className={`puzzle-confirmation-slot ${
+              solutionStep > 0 ? "is-active" : ""
+            }`}
+          >
+            {solutionStep > 0 ? (
+              <div
+                className="puzzle-confirmation"
+                role="dialog"
+                aria-modal="false"
+              >
+                <p className="puzzle-confirmation-text">
+                  {solutionStep === 1
+                    ? "Are you sure?"
+                    : solutionStep === 2
+                      ? "Really sure? Hint: Think outside the box!"
+                      : "Last chance."}
+                </p>
+                <div className="puzzle-confirmation-actions">
+                  <button
+                    type="button"
+                    className="puzzle-button"
+                    onClick={cancelSolutionFlow}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="puzzle-button"
+                    onClick={advanceSolutionFlow}
+                  >
+                    {solutionStep === 3 ? "Show solution" : "Continue"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
-      ) : null}
+      </div>
 
       <div className="puzzle-board-shell">
         <svg
@@ -471,6 +485,15 @@ export function GameSection() {
           role="img"
           aria-label="Nine dots puzzle board"
         >
+          <rect
+            x={VISIBLE_BOARD_MIN}
+            y={VISIBLE_BOARD_MIN}
+            width={VISIBLE_BOARD_SIZE}
+            height={VISIBLE_BOARD_SIZE}
+            rx="14"
+            className="puzzle-visible-box"
+          />
+
           {renderedSegments.map((segment) => {
             const startDot = getDot(segment.startId);
             const endDot = getDot(segment.endId);

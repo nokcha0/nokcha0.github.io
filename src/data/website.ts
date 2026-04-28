@@ -27,9 +27,9 @@ export const sectionLabels: Record<SectionId, string> = {
 export const introContent = {
   role: "About",
   summaries: [
-    "Hello [[{{visitorOrdinal}} visitor|Made-up number. This page is static and does not track you.]]. My name is Joonhyun. It could be a bit tricky to pronounce, so you can call me [[Joon|Like the month June.]].",
-    "My full Korean name is 장준현. Online, I like to go by **nokcha0**, which means [[green tea in Korean|nok = 녹, cha = 차. Together: 녹차.]]. The name came from a cup of green tea sitting on my desk while I was signing up for GitHub. The 0? A tiny tribute to the fact that nokcha was already taken.",
-    "I'm currently studying Software Engineering at McGill University. So far, [[it has been fun|Except that one thermodynamics class. No hate to the prof.]], which I am choosing to interpret as a good sign.",
+    "Hello [[{{visitorOrdinal}} visitor|I just made this up. This page is static and doesn't track you.]]. My name is Joonhyun. It could be a bit tricky to pronounce, so you can call me [[Joon|Like the month June.]].",
+    "My full Korean name is 장준현. Online, I like to go by **nokcha0**, which means [[green tea in Korean|nok = 녹, cha = 차. Together: 녹차.]]. The name came from a cup of green tea sitting on my desk while I was signing up for GitHub. The 0 is a tiny tribute to the fact that nokcha was already taken.",
+    "I'm currently based in Montréal, studying Software Engineering at McGill University. ",
   ],
 };
 
