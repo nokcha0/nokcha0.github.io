@@ -212,7 +212,7 @@ function App() {
   return (
     <ClickSpark
       sparkColor={themeMode === "dark" ? "#cecdc3" : "#24837b"}
-      disabled={prefersReducedMotion()}
+      disabled={false}
       ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle, .puzzle-board, .puzzle-button"
     >
       <div

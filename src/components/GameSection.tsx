@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { RichText } from "./RichText";
 
@@ -155,6 +155,7 @@ function randomInRange(min: number, max: number) {
 export function GameSection() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const crossedDotIdsRef = useRef<Set<string>>(new Set());
+  const [gameStarted, setGameStarted] = useState(false);
   const [segments, setSegments] = useState<LineSegment[]>([]);
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [jellyTokens, setJellyTokens] = useState<Record<string, number>>({});
@@ -169,9 +170,7 @@ export function GameSection() {
   const linesUsed = solutionVisible ? MAX_SEGMENTS : segments.length;
   const canDraw = !solutionVisible && segments.length < MAX_SEGMENTS;
 
-  useEffect(() => {
-    if (!isSolved) return;
-
+  const playConfetti = useCallback(() => {
     const confetti = window.confetti;
     if (typeof confetti !== "function") return;
 
@@ -181,7 +180,23 @@ export function GameSection() {
       startVelocity: 24,
       spread: 300,
       ticks: 45,
-      zIndex: 0,
+      disableForReducedMotion: false,
+      zIndex: 2147483647,
+    };
+
+    const fireBurst = (particleCount: number) => {
+      confetti(
+        Object.assign({}, defaults, {
+          count: particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: randomInRange(0, 0.25) },
+        }),
+      );
+      confetti(
+        Object.assign({}, defaults, {
+          count: particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0, 0.25) },
+        }),
+      );
     };
 
     const intervalId = window.setInterval(() => {
@@ -193,23 +208,18 @@ export function GameSection() {
       }
 
       const particleCount = 18 * (timeLeft / duration);
-
-      confetti(
-        Object.assign({}, defaults, {
-          particleCount,
-          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-        }),
-      );
-      confetti(
-        Object.assign({}, defaults, {
-          particleCount,
-          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-        }),
-      );
+      fireBurst(particleCount);
     }, 350);
 
-    return () => window.clearInterval(intervalId);
-  }, [isSolved]);
+    fireBurst(28);
+    window.setTimeout(() => window.clearInterval(intervalId), duration + 100);
+  }, []);
+
+  useEffect(() => {
+    if (!isSolved) return;
+
+    playConfetti();
+  }, [isSolved, playConfetti]);
 
   const getLocalPoint = (event: ReactPointerEvent<SVGSVGElement>) => {
     const svgElement = svgRef.current;
@@ -409,16 +419,39 @@ export function GameSection() {
 
   return (
     <section className="section puzzle-section" aria-labelledby="puzzle-title">
-      <h2 id="puzzle-title">Thanks for coming. A small game for you:</h2>
-      <p className="puzzle-summary">
-        <span className="puzzle-summary-text">
-          <RichText text="Can you cover all 9 dots with four [[consecutive|without lifting the pen.]] straight lines?" />
-        </span>
-        <span className="puzzle-count" aria-live="polite">
-          {linesUsed} / {MAX_SEGMENTS}
-        </span>
-      </p>
+      <div className="puzzle-invite">
+        <h2 id="puzzle-title">Thanks for Coming.</h2>
+        <div className="puzzle-invite-row">
+          {!gameStarted ? (
+            <>
+              <p className="puzzle-invite-text">
+                Do you want to play a small game?
+              </p>
+              <button
+                type="button"
+                className="puzzle-button"
+                onClick={() => setGameStarted(true)}
+              >
+                Yes
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="puzzle-summary-text">
+                <RichText text="Can you cover all 9 dots with four [[consecutive|without lifting the pen.]] straight lines?" />
+              </span>
+              <span className="puzzle-count" aria-live="polite">
+                {linesUsed} / {MAX_SEGMENTS}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
 
+      {!gameStarted ? <div className="puzzle-idle-spacer" /> : null}
+
+      {gameStarted ? (
+        <>
       <div className="puzzle-toolbar">
         <div className="puzzle-actions">
           <button type="button" className="puzzle-button" onClick={resetGame}>
@@ -548,6 +581,8 @@ export function GameSection() {
           ))}
         </svg>
       </div>
+        </>
+      ) : null}
     </section>
   );
 }

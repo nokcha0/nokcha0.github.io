@@ -796,6 +796,32 @@ h3 {
   position: relative;
 }
 
+.puzzle-invite {
+  padding: 1rem 0 0;
+}
+
+.puzzle-invite h2 {
+  margin-bottom: 1.1rem;
+}
+
+.puzzle-invite-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.puzzle-invite-text {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.puzzle-idle-spacer {
+  height: clamp(13rem, 38vh, 22rem);
+}
+
 .puzzle-summary {
   display: flex;
   align-items: baseline;
@@ -821,6 +847,10 @@ h3 {
   margin-bottom: 0.25rem;
 }
 
+.puzzle-invite + .puzzle-toolbar {
+  margin-top: 0.65rem;
+}
+
 .puzzle-count {
   margin: 0;
   color: #fff;
@@ -831,7 +861,7 @@ h3 {
 
 .puzzle-actions {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 0.55rem;
 }
 
@@ -842,6 +872,10 @@ h3 {
 }
 
 .puzzle-button {
+  min-height: 2.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: transparent;
@@ -875,18 +909,24 @@ h3 {
 }
 
 .puzzle-confirmation {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  height: 100%;
+  min-height: 0;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--surface);
-  padding: 0.42rem 0.5rem 0.42rem 0.65rem;
+  padding: 0 0.35rem 0 0.65rem;
 }
 
 .puzzle-confirmation-slot {
   flex: 0 0 clamp(28rem, 58vw, 31rem);
-  min-height: 2.75rem;
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
+  min-height: 0;
   opacity: 0;
   transition: opacity 160ms ease;
 }
@@ -900,8 +940,14 @@ h3 {
   margin: 0;
   color: var(--text);
   font-size: 0.86rem;
-  line-height: 1.25;
+  line-height: 1;
   white-space: nowrap;
+}
+
+.puzzle-confirmation .puzzle-button {
+  height: 1.55rem;
+  min-height: 1.55rem;
+  padding: 0.32rem 0.55rem;
 }
 
 .puzzle-board-shell {
@@ -1200,6 +1246,14 @@ h3 {
     flex-direction: column;
   }
 
+  .puzzle-invite {
+    padding-bottom: 0;
+  }
+
+  .puzzle-idle-spacer {
+    height: clamp(10rem, 34vh, 18rem);
+  }
+
   .puzzle-actions,
   .puzzle-confirmation-actions {
     width: 100%;
@@ -1209,6 +1263,8 @@ h3 {
 
   .puzzle-confirmation {
     flex-wrap: wrap;
+    height: auto;
+    min-height: 2.1rem;
   }
 
   .puzzle-confirmation-slot {
