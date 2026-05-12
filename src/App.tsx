@@ -20,6 +20,7 @@ function App() {
   );
   const [emailCopied, setEmailCopied] = useState(false);
   const experienceTouchStartRef = useRef<{ x: number; y: number } | null>(null);
+  console.log("What are you doing here, go back");
 
   useEffect(() => {
     document.documentElement.dataset.theme = themeMode;
