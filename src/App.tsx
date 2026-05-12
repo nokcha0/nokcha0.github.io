@@ -4,15 +4,50 @@ import "./App.css";
 import { TopNav } from "./components/TopNav";
 import { IntroSection } from "./components/IntroSection";
 import { ExperienceSection } from "./components/ExperienceSection";
+import { ToolsSection } from "./components/ToolsSection";
+import { ThoughtsSection } from "./components/ThoughtsSection";
 import { ContactSection } from "./components/ContactSection";
 import { GameSection } from "./components/GameSection";
 import ClickSpark from "./components/ClickSpark";
-import { sectionOrder, timelineCategories } from "./data/website";
+import { timelineCategories } from "./data/website";
 import { getInitialThemeMode, prefersReducedMotion } from "./utils/theme";
-import type { SectionId, ThemeMode, TimelineCategory } from "./types/website";
+import type {
+  NavLink,
+  PageId,
+  SectionId,
+  ThemeMode,
+  TimelineCategory,
+} from "./types/website";
+
+type RouteState = {
+  page: PageId;
+  section: SectionId | null;
+};
+
+function getRouteFromHash(): RouteState {
+  const hash = window.location.hash.replace(/^#/, "");
+
+  if (hash === "/tools") {
+    return { page: "tools", section: null };
+  }
+
+  if (hash === "/thoughts") {
+    return { page: "thoughts", section: null };
+  }
+
+  if (hash === "contact") {
+    return { page: "home", section: "contact" };
+  }
+
+  return { page: "home", section: "intro" };
+}
 
 function App() {
-  const [activeSection, setActiveSection] = useState<SectionId>("intro");
+  const initialRoute = getRouteFromHash();
+  const [activePage, setActivePage] = useState<PageId>(initialRoute.page);
+  const [targetSection, setTargetSection] = useState<SectionId | null>(
+    initialRoute.section,
+  );
   const [activeTimeline, setActiveTimeline] =
     useState<TimelineCategory>("education");
   const [themeMode, setThemeMode] = useState<ThemeMode>(() =>
@@ -28,45 +63,54 @@ function App() {
   }, [themeMode]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleSections = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+    const syncRoute = () => {
+      const nextRoute = getRouteFromHash();
+      setActivePage(nextRoute.page);
+      setTargetSection(nextRoute.section);
+    };
 
-        if (visibleSections[0]) {
-          setActiveSection(visibleSections[0].target.id as SectionId);
-        }
-      },
-      {
-        rootMargin: "-35% 0px -55% 0px",
-        threshold: [0.2, 0.4, 0.6],
-      },
-    );
-
-    const sections = sectionOrder
-      .map((id) => document.getElementById(id))
-      .filter((element): element is HTMLElement => element !== null);
-
-    sections.forEach((section) => observer.observe(section));
-
-    return () => observer.disconnect();
+    window.addEventListener("hashchange", syncRoute);
+    return () => window.removeEventListener("hashchange", syncRoute);
   }, []);
+
+  useEffect(() => {
+    if (activePage !== "home") {
+      window.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+      });
+      return;
+    }
+
+    if (!targetSection) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      const section = document.getElementById(targetSection);
+      if (!section) return;
+
+      section.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "start",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [activePage, targetSection]);
 
   const onNavClick = (
     event: MouseEvent<HTMLAnchorElement>,
-    sectionId: SectionId,
+    link: NavLink,
   ): void => {
     event.preventDefault();
 
-    const section = document.getElementById(sectionId);
-    if (!section) return;
+    if (window.location.hash === link.href) {
+      const nextRoute = getRouteFromHash();
+      setActivePage(nextRoute.page);
+      setTargetSection(nextRoute.section);
+      return;
+    }
 
-    section.scrollIntoView({
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-      block: "start",
-    });
-    setActiveSection(sectionId);
+    window.location.hash = link.href;
   };
 
   useEffect(() => {
@@ -171,9 +215,11 @@ function App() {
       disabled={prefersReducedMotion()}
       ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle, .puzzle-board, .puzzle-button"
     >
-      <div className="site-shell">
+      <div
+        className={`site-shell ${activePage === "tools" ? "site-shell-wide" : ""}`}
+      >
         <TopNav
-          activeSection={activeSection}
+          activePage={activePage}
           themeMode={themeMode}
           onNavClick={onNavClick}
           onThemeToggle={() =>
@@ -182,20 +228,31 @@ function App() {
         />
 
         <main>
-          <IntroSection />
+          {activePage === "home" ? (
+            <>
+              <IntroSection />
 
-          <ExperienceSection
-            activeTimeline={activeTimeline}
-            themeMode={themeMode}
-            onActivateTimeline={activateTimeline}
-            onTimelineSwitcherKeyDown={onTimelineSwitcherKeyDown}
-            onExperienceTouchStart={onExperienceTouchStart}
-            onExperienceTouchEnd={onExperienceTouchEnd}
-          />
+              <ExperienceSection
+                activeTimeline={activeTimeline}
+                themeMode={themeMode}
+                onActivateTimeline={activateTimeline}
+                onTimelineSwitcherKeyDown={onTimelineSwitcherKeyDown}
+                onExperienceTouchStart={onExperienceTouchStart}
+                onExperienceTouchEnd={onExperienceTouchEnd}
+              />
 
-          <ContactSection emailCopied={emailCopied} onEmailCopy={onEmailCopy} />
+              <ContactSection
+                emailCopied={emailCopied}
+                onEmailCopy={onEmailCopy}
+              />
 
-          <GameSection />
+              <GameSection />
+            </>
+          ) : null}
+
+          {activePage === "tools" ? <ToolsSection /> : null}
+
+          {activePage === "thoughts" ? <ThoughtsSection /> : null}
         </main>
       </div>
     </ClickSpark>

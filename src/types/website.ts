@@ -1,5 +1,7 @@
 export type SectionId = "intro" | "experience" | "contact";
 
+export type PageId = "home" | "tools" | "thoughts";
+
 export type ThemeMode = "dark" | "light";
 
 export type ContactLabel = "Email" | "LinkedIn" | "GitHub";
@@ -38,5 +40,26 @@ export type ContactLink = {
 
 export type IntroContactLink = {
   label: ContactLabel;
+  href: string;
+};
+
+export type ToolGroup = {
+  label: string;
+  tools: {
+    name: string;
+    note: string;
+    icon: string;
+  }[];
+};
+
+export type ThoughtEntry = {
+  title: string;
+  summary: string;
+  date: string;
+};
+
+export type NavLink = {
+  id: PageId;
+  label: string;
   href: string;
 };

@@ -1,10 +1,13 @@
 import type {
   ContactLink,
   IntroContactLink,
+  NavLink,
   SectionId,
+  ThoughtEntry,
   TimelineCategory,
   TimelineCategoryOption,
   TimelineEntry,
+  ToolGroup,
 } from "../types/website";
 
 export const sectionOrder: readonly SectionId[] = [
@@ -18,6 +21,12 @@ export const sectionLabels: Record<SectionId, string> = {
   experience: "Experience",
   contact: "Contact",
 };
+
+export const navLinks: readonly NavLink[] = [
+  { id: "home", label: "Home", href: "#/" },
+  { id: "tools", label: "Tools", href: "#/tools" },
+  { id: "thoughts", label: "Thoughts", href: "#/thoughts" },
+];
 
 // Inline formatting supported in text fields:
 // **bold**
@@ -188,6 +197,128 @@ export const contactLinks: readonly ContactLink[] = [
     label: "GitHub",
     href: "https://github.com/nokcha0",
     value: "github.com/nokcha0",
+  },
+];
+
+export const toolGroups: readonly ToolGroup[] = [
+  {
+    label: "Daily",
+    tools: [
+      {
+        name: "Zen",
+        note: "Browser",
+        icon: "/tool-icons/zen-browser-dark.svg",
+      },
+      {
+        name: "Command Palette",
+        note: "App Launcher",
+        icon: "/tool-icons/powertoys.svg",
+      },
+      {
+        name: "Obsidian",
+        note: "Notes",
+        icon: "/tool-icons/obsidian.svg",
+      },
+    ],
+  },
+  {
+    label: "Dev",
+    tools: [
+      {
+        name: "WezTerm",
+        note: "Terminal",
+        icon: "/tool-icons/wezterm.png",
+      },
+      {
+        name: "VS Code",
+        note: "IDE",
+        icon: "/tool-icons/vscode.svg",
+      },
+      {
+        name: "tmux",
+        note: "Terminal Multiplexer",
+        icon: "/tool-icons/tmux.svg",
+      },
+    ],
+  },
+  {
+    label: "Systems",
+    tools: [
+      {
+        name: "Windows 11",
+        note: "Desktop",
+        icon: "/tool-icons/windows-11.png",
+      },
+      {
+        name: "NixOS (WSL)",
+        note: "Linux",
+        icon: "/tool-icons/nixos.svg",
+      },
+      {
+        name: "Kali Linux (WSL)",
+        note: "For CTF competitions",
+        icon: "/tool-icons/kali-linux.svg",
+      },
+    ],
+  },
+];
+
+export const thoughtEntries: readonly ThoughtEntry[] = [
+  {
+    title: "UDP",
+    summary: "I know a UDP joke, but I don't really care if you get it",
+    date: "May 2026",
+  },
+  {
+    title: "Snacks ",
+    summary: "Feels like the office snacks got nerfed compared to last year",
+    date: "May 2026",
+  },
+  {
+    title: "AtHack CTF",
+    summary: "Few minutes away from first place. Should've just slept",
+    date: "March 2026",
+  },
+  {
+    title: "Birthdays",
+    summary: "Were you born on your birthday? What a coincidence, me too",
+    date: "Oct 2025",
+  },
+  {
+    title: "Kaboom",
+    summary: "Throw an aerosol can in the fire and watch it (at a distance)",
+    date: "Jun 2025",
+  },
+  {
+    title: "Giraffes",
+    summary: "How long would it take for them to throw up",
+    date: "Oct 2024",
+  },
+  {
+    title: "Leg Workouts",
+    summary: "I only know git push & git pull, never heard of git legs",
+    date: "Oct 2024",
+  },
+  {
+    title: "Alcalá de Henares",
+    summary: "Hid a shopping cart somewhere with Alper",
+    date: "Aug 2024",
+  },
+  {
+    title: "Campfires",
+    summary:
+      "Build a man a fire, and he’ll be warm for a night. Set a man on fire, and he’ll be warm for the rest of his life",
+    date: "May 2022",
+  },
+  {
+    title: "Bass Guitar",
+    summary: "Eddie Ate Dynamite, Good.",
+    date: "May 2021",
+  },
+  {
+    title: "Blood Test",
+    summary: "Got a B+ on the blood test without studying",
+    date: "Long time ago",
   },
 ];
 

@@ -1,42 +1,46 @@
 import type { MouseEvent } from "react";
-import { sectionLabels, sectionOrder } from "../data/website";
+import { navLinks } from "../data/website";
 import { ThemeIcon } from "./icons";
-import type { SectionId, ThemeMode } from "../types/website";
+import type { NavLink, PageId, ThemeMode } from "../types/website";
 
 type TopNavProps = {
-  activeSection: SectionId;
+  activePage: PageId;
   themeMode: ThemeMode;
-  onNavClick: (event: MouseEvent<HTMLAnchorElement>, sectionId: SectionId) => void;
+  onNavClick: (event: MouseEvent<HTMLAnchorElement>, link: NavLink) => void;
   onThemeToggle: () => void;
 };
 
 export function TopNav({
-  activeSection,
+  activePage,
   themeMode,
   onNavClick,
   onThemeToggle,
 }: TopNavProps) {
+  const isActiveLink = (link: NavLink) => activePage === link.id;
+
   return (
     <header className="floating-nav" aria-label="Primary">
       <a
-        href="#intro"
+        href="#/"
         className="nav-home"
-        onClick={(event) => onNavClick(event, "intro")}
+        onClick={(event) =>
+          onNavClick(event, { id: "home", label: "Home", href: "#/" })
+        }
         aria-label="Joonhyun Chang"
       >
         Joonhyun Chang
       </a>
       <nav>
         <ul>
-          {sectionOrder.map((sectionId) => (
-            <li key={sectionId} className="section-nav-item">
+          {navLinks.map((link) => (
+            <li key={link.id} className="section-nav-item">
               <a
-                href={`#${sectionId}`}
-                onClick={(event) => onNavClick(event, sectionId)}
-                className={activeSection === sectionId ? "is-active" : ""}
-                aria-current={activeSection === sectionId ? "page" : undefined}
+                href={link.href}
+                onClick={(event) => onNavClick(event, link)}
+                className={isActiveLink(link) ? "is-active" : ""}
+                aria-current={isActiveLink(link) ? "page" : undefined}
               >
-                {sectionLabels[sectionId]}
+                {link.label}
               </a>
             </li>
           ))}
