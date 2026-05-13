@@ -804,6 +804,8 @@ h3 {
 }
 
 .puzzle-invite {
+  position: relative;
+  z-index: 2;
   padding: 1rem 0 0;
 }
 
@@ -852,10 +854,16 @@ h3 {
   justify-content: flex-start;
   gap: 1rem;
   margin-bottom: 0.25rem;
+  pointer-events: none;
 }
 
 .puzzle-invite + .puzzle-toolbar {
   margin-top: 0.65rem;
+}
+
+.puzzle-game-content {
+  margin-top: 0.65rem;
+  animation: puzzle-game-fade-in 260ms ease-out both;
 }
 
 .puzzle-count {
@@ -889,9 +897,10 @@ h3 {
   color: var(--text-soft);
   font: inherit;
   font-size: 0.9rem;
-  line-height: 1;
-  padding: 0.55rem 0.8rem;
+  line-height: 1.2;
+  padding: 0.45rem 0.8rem;
   cursor: pointer;
+  pointer-events: auto;
   transition:
     border-color 160ms ease,
     color 160ms ease,
@@ -926,6 +935,7 @@ h3 {
   border-radius: 8px;
   background: var(--surface);
   padding: 0 0.35rem 0 0.65rem;
+  pointer-events: auto;
 }
 
 .puzzle-confirmation-slot {
@@ -969,7 +979,7 @@ h3 {
   width: 100%;
   height: auto;
   display: block;
-  margin-top: -3.8rem;
+  margin-top: -6.5rem;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
@@ -1048,6 +1058,18 @@ h3 {
 
   100% {
     transform: translateX(0) translateY(0) scale(1);
+  }
+}
+
+@keyframes puzzle-game-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(0.35rem);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -1290,7 +1312,7 @@ h3 {
   }
 
   .puzzle-board {
-    margin-top: -1.2rem;
+    margin-top: -3.5rem;
   }
 
 }
@@ -1331,6 +1353,10 @@ h3 {
   }
 
   .puzzle-dot-shell.is-jelly {
+    animation: none;
+  }
+
+  .puzzle-game-content {
     animation: none;
   }
 }

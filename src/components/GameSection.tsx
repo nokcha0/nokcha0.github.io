@@ -34,7 +34,7 @@ const VISIBLE_BOARD_PADDING = 22;
 const VISIBLE_BOARD_MIN = BOARD_OFFSET + GRID_STEP - VISIBLE_BOARD_PADDING;
 const VISIBLE_BOARD_SIZE = GRID_STEP * 2 + VISIBLE_BOARD_PADDING * 2;
 const VISIBLE_SNAP_RADIUS = 28;
-const HIDDEN_SNAP_RADIUS = 22;
+const HIDDEN_SNAP_RADIUS = 34;
 const CARRY_DOT_SNAP_RADIUS = 30;
 const COVERAGE_TOLERANCE = 8;
 const MAX_SEGMENTS = 4;
@@ -427,7 +427,7 @@ export function GameSection() {
           {!gameStarted ? (
             <>
               <p className="puzzle-invite-text">
-                Do you want to play a small game?
+                Do you want to solve a small puzzle?
               </p>
               <button
                 type="button"
@@ -453,137 +453,141 @@ export function GameSection() {
       {!gameStarted ? <div className="puzzle-idle-spacer" /> : null}
 
       {gameStarted ? (
-        <>
-      <div className="puzzle-toolbar">
-        <div className="puzzle-actions">
-          <button type="button" className="puzzle-button" onClick={resetGame}>
-            Reset
-          </button>
-          <button
-            type="button"
-            className="puzzle-button"
-            onClick={openSolutionFlow}
-            disabled={solutionVisible}
-          >
-            See solution
-          </button>
-          <div
-            className={`puzzle-confirmation-slot ${
-              solutionStep > 0 ? "is-active" : ""
-            }`}
-          >
-            {solutionStep > 0 ? (
-              <div
-                className="puzzle-confirmation"
-                role="dialog"
-                aria-modal="false"
+        <div className="puzzle-game-content">
+          <div className="puzzle-toolbar">
+            <div className="puzzle-actions">
+              <button
+                type="button"
+                className="puzzle-button"
+                onClick={resetGame}
               >
-                <p className="puzzle-confirmation-text">
-                  {solutionStep === 1
-                    ? "Are you sure?"
-                    : solutionStep === 2
-                      ? "Really sure? Hint: Think outside the box!"
-                      : "Last chance."}
-                </p>
-                <div className="puzzle-confirmation-actions">
-                  <button
-                    type="button"
-                    className="puzzle-button"
-                    onClick={cancelSolutionFlow}
+                Reset
+              </button>
+              <button
+                type="button"
+                className="puzzle-button"
+                onClick={openSolutionFlow}
+                disabled={solutionVisible}
+              >
+                See solution
+              </button>
+              <div
+                className={`puzzle-confirmation-slot ${
+                  solutionStep > 0 ? "is-active" : ""
+                }`}
+              >
+                {solutionStep > 0 ? (
+                  <div
+                    className="puzzle-confirmation"
+                    role="dialog"
+                    aria-modal="false"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="puzzle-button"
-                    onClick={advanceSolutionFlow}
-                  >
-                    {solutionStep === 3 ? "Show solution" : "Continue"}
-                  </button>
-                </div>
+                    <p className="puzzle-confirmation-text">
+                      {solutionStep === 1
+                        ? "Are you sure?"
+                        : solutionStep === 2
+                          ? "Really sure? Hint: Think outside the box!"
+                          : "Last chance."}
+                    </p>
+                    <div className="puzzle-confirmation-actions">
+                      <button
+                        type="button"
+                        className="puzzle-button"
+                        onClick={cancelSolutionFlow}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="puzzle-button"
+                        onClick={advanceSolutionFlow}
+                      >
+                        {solutionStep === 3 ? "Show solution" : "Continue"}
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </div>
-            ) : null}
+            </div>
+          </div>
+
+          <div className="puzzle-board-shell">
+            <svg
+              ref={svgRef}
+              viewBox={`0 0 ${BOARD_SIZE} ${BOARD_SIZE}`}
+              className="puzzle-board"
+              onPointerDown={onBoardPointerDown}
+              onPointerMove={onBoardPointerMove}
+              onPointerUp={(event) => finishDrag(event, true)}
+              onPointerCancel={(event) => finishDrag(event, false)}
+              onPointerLeave={(event) => finishDrag(event, false)}
+              role="img"
+              aria-label="Nine dots puzzle board"
+            >
+              <rect
+                x={VISIBLE_BOARD_MIN}
+                y={VISIBLE_BOARD_MIN}
+                width={VISIBLE_BOARD_SIZE}
+                height={VISIBLE_BOARD_SIZE}
+                rx="14"
+                className="puzzle-visible-box"
+              />
+
+              {renderedSegments.map((segment) => {
+                const startDot = getDot(segment.startId);
+                const endDot = getDot(segment.endId);
+                if (!startDot || !endDot) return null;
+
+                return (
+                  <line
+                    key={`${segment.startId}-${segment.endId}`}
+                    className={`puzzle-segment ${
+                      solutionVisible ? "is-solution" : ""
+                    }`}
+                    x1={startDot.x}
+                    y1={startDot.y}
+                    x2={endDot.x}
+                    y2={endDot.y}
+                  />
+                );
+              })}
+
+              {dragState && previewStartDot ? (
+                <line
+                  className="puzzle-preview"
+                  x1={previewStartDot.x}
+                  y1={previewStartDot.y}
+                  x2={previewEndDot ? previewEndDot.x : dragState.pointerX}
+                  y2={previewEndDot ? previewEndDot.y : dragState.pointerY}
+                />
+              ) : null}
+
+              {carryDot ? (
+                <circle
+                  cx={carryDot.x}
+                  cy={carryDot.y}
+                  r={DOT_RADIUS + 7}
+                  className="puzzle-carry-dot"
+                />
+              ) : null}
+              {VISIBLE_DOTS.map((dot) => (
+                <g
+                  key={`${dot.id}-${jellyTokens[dot.id] ?? 0}`}
+                  className={`puzzle-dot-shell ${
+                    jellyTokens[dot.id] ? "is-jelly" : ""
+                  }`}
+                >
+                  <circle
+                    cx={dot.x}
+                    cy={dot.y}
+                    r={DOT_RADIUS}
+                    className="puzzle-dot"
+                  />
+                </g>
+              ))}
+            </svg>
           </div>
         </div>
-      </div>
-
-      <div className="puzzle-board-shell">
-        <svg
-          ref={svgRef}
-          viewBox={`0 0 ${BOARD_SIZE} ${BOARD_SIZE}`}
-          className="puzzle-board"
-          onPointerDown={onBoardPointerDown}
-          onPointerMove={onBoardPointerMove}
-          onPointerUp={(event) => finishDrag(event, true)}
-          onPointerCancel={(event) => finishDrag(event, false)}
-          onPointerLeave={(event) => finishDrag(event, false)}
-          role="img"
-          aria-label="Nine dots puzzle board"
-        >
-          <rect
-            x={VISIBLE_BOARD_MIN}
-            y={VISIBLE_BOARD_MIN}
-            width={VISIBLE_BOARD_SIZE}
-            height={VISIBLE_BOARD_SIZE}
-            rx="14"
-            className="puzzle-visible-box"
-          />
-
-          {renderedSegments.map((segment) => {
-            const startDot = getDot(segment.startId);
-            const endDot = getDot(segment.endId);
-            if (!startDot || !endDot) return null;
-
-            return (
-              <line
-                key={`${segment.startId}-${segment.endId}`}
-                className={`puzzle-segment ${
-                  solutionVisible ? "is-solution" : ""
-                }`}
-                x1={startDot.x}
-                y1={startDot.y}
-                x2={endDot.x}
-                y2={endDot.y}
-              />
-            );
-          })}
-
-          {dragState && previewStartDot ? (
-            <line
-              className="puzzle-preview"
-              x1={previewStartDot.x}
-              y1={previewStartDot.y}
-              x2={previewEndDot ? previewEndDot.x : dragState.pointerX}
-              y2={previewEndDot ? previewEndDot.y : dragState.pointerY}
-            />
-          ) : null}
-
-          {carryDot ? (
-            <circle
-              cx={carryDot.x}
-              cy={carryDot.y}
-              r={DOT_RADIUS + 7}
-              className="puzzle-carry-dot"
-            />
-          ) : null}
-          {VISIBLE_DOTS.map((dot) => (
-            <g
-              key={`${dot.id}-${jellyTokens[dot.id] ?? 0}`}
-              className={`puzzle-dot-shell ${
-                jellyTokens[dot.id] ? "is-jelly" : ""
-              }`}
-            >
-              <circle
-                cx={dot.x}
-                cy={dot.y}
-                r={DOT_RADIUS}
-                className="puzzle-dot"
-              />
-            </g>
-          ))}
-        </svg>
-      </div>
-        </>
       ) : null}
     </section>
   );

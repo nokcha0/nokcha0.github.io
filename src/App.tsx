@@ -213,7 +213,7 @@ function App() {
     <ClickSpark
       sparkColor={themeMode === "dark" ? "#cecdc3" : "#24837b"}
       disabled={false}
-      ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle, .puzzle-board, .puzzle-button"
+      ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle, .puzzle-button"
     >
       <div className="site-shell">
         <TopNav
