@@ -34,8 +34,8 @@ const VISIBLE_BOARD_PADDING = 22;
 const VISIBLE_BOARD_MIN = BOARD_OFFSET + GRID_STEP - VISIBLE_BOARD_PADDING;
 const VISIBLE_BOARD_SIZE = GRID_STEP * 2 + VISIBLE_BOARD_PADDING * 2;
 const VISIBLE_SNAP_RADIUS = 28;
-const HIDDEN_SNAP_RADIUS = 11;
-const CARRY_DOT_SNAP_RADIUS = 20;
+const HIDDEN_SNAP_RADIUS = 22;
+const CARRY_DOT_SNAP_RADIUS = 30;
 const COVERAGE_TOLERANCE = 8;
 const MAX_SEGMENTS = 4;
 
@@ -323,6 +323,7 @@ export function GameSection() {
   const onBoardPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
     if (!dragState) return;
 
+    event.preventDefault();
     const point = getLocalPoint(event);
     const startDot = getDot(dragState.startDotId);
     const targetDot = findNearestDot(point.x, point.y, ALL_DOTS);
@@ -367,6 +368,7 @@ export function GameSection() {
   ) => {
     if (!dragState) return;
 
+    event.preventDefault();
     const point = getLocalPoint(event);
     const startDot = getDot(dragState.startDotId);
     const endDot = shouldCommit

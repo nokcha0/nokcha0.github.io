@@ -246,7 +246,7 @@ export const toolGroups: readonly ToolGroup[] = [
     tools: [
       {
         name: "Windows 11",
-        note: "Desktop",
+        note: "Laptop",
         icon: "/tool-icons/windows-11.png",
       },
       {
@@ -292,6 +292,12 @@ export const thoughtEntries: readonly ThoughtEntry[] = [
   {
     title: "Giraffes",
     summary: "How long would it take for them to throw up",
+    date: "Oct 2024",
+  },
+  {
+    title: "Extrapolation",
+    summary:
+      "There are two kinds of people in this world. Those who can extrapolate from partial information.",
     date: "Oct 2024",
   },
   {

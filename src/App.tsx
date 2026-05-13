@@ -39,7 +39,7 @@ function getRouteFromHash(): RouteState {
     return { page: "home", section: "contact" };
   }
 
-  return { page: "home", section: "intro" };
+  return { page: "home", section: null };
 }
 
 function App() {
@@ -215,9 +215,7 @@ function App() {
       disabled={false}
       ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle, .puzzle-board, .puzzle-button"
     >
-      <div
-        className={`site-shell ${activePage === "tools" ? "site-shell-wide" : ""}`}
-      >
+      <div className="site-shell">
         <TopNav
           activePage={activePage}
           themeMode={themeMode}

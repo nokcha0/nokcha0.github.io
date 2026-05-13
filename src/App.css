@@ -9,10 +9,6 @@
   position: relative;
 }
 
-.site-shell-wide {
-  width: min(57rem, 100% - 2rem);
-}
-
 .floating-nav {
   --nav-item-height: 1.8rem;
   display: flex;
@@ -397,11 +393,22 @@ h3 {
 }
 
 .tool-group {
+  position: relative;
   display: grid;
   grid-template-columns: 6.5rem minmax(0, 1fr);
   gap: clamp(1rem, 3vw, 2rem);
   background: transparent;
   padding: 0;
+}
+
+.tool-group::before {
+  content: "";
+  position: absolute;
+  left: calc(6.5rem + clamp(1rem, 3vw, 2rem) - 0.6rem);
+  top: 0.15rem;
+  bottom: 0.15rem;
+  width: 1px;
+  background: var(--border);
 }
 
 .tool-group-head {
@@ -419,7 +426,7 @@ h3 {
 
 .tool-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   column-gap: 1.2rem;
   row-gap: 0.75rem;
   min-width: 0;
@@ -462,7 +469,8 @@ h3 {
 }
 
 .tool-copy {
-  display: flex;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
   align-items: baseline;
   gap: 0.45rem;
   min-width: 0;
@@ -481,10 +489,9 @@ h3 {
   margin: 0;
   color: var(--text-muted);
   font-size: 0.84rem;
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 .tool-note::before {
@@ -953,6 +960,7 @@ h3 {
 .puzzle-board-shell {
   position: relative;
   overflow: visible;
+  overscroll-behavior: contain;
 }
 
 .puzzle-board {
@@ -963,6 +971,8 @@ h3 {
   display: block;
   margin-top: -3.8rem;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .puzzle-visible-box {
@@ -1044,10 +1054,6 @@ h3 {
 @media (min-width: 740px) {
   .site-shell {
     width: min(44rem, 100% - 4rem);
-  }
-
-  .site-shell-wide {
-    width: min(57rem, 100% - 4rem);
   }
 
   .section {
@@ -1133,6 +1139,12 @@ h3 {
     padding: 0;
   }
 
+  .tool-group::before {
+    left: 0;
+    top: 1.95rem;
+    bottom: 0.1rem;
+  }
+
   .tool-group-head {
     padding-right: 0;
     padding-top: 0;
@@ -1149,6 +1161,7 @@ h3 {
 
   .tool-copy {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.2rem;
   }
 
@@ -1274,6 +1287,10 @@ h3 {
 
   .puzzle-confirmation-text {
     white-space: normal;
+  }
+
+  .puzzle-board {
+    margin-top: -1.2rem;
   }
 
 }
