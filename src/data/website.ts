@@ -128,7 +128,7 @@ export const timelines: Record<TimelineCategory, TimelineEntry[]> = {
       location: "Montreal, QC",
       logoDark: "/logo/cyberengmcgill.png",
       logoLight: "/logo/cyberengmcgill_black.png",
-      website: "https://cyberengineeringmcgill.club",
+      website: "https://cyber-engineering-mcgill.github.io",
       roles: [
         {
           title: "VP Tech Lead",
