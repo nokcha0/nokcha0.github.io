@@ -1,16 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, MouseEvent, TouchEvent } from "react";
 import "./App.css";
 import { TopNav } from "./components/TopNav";
 import { IntroSection } from "./components/IntroSection";
 import { ExperienceSection } from "./components/ExperienceSection";
-import { ToolsSection } from "./components/ToolsSection";
-import { ThoughtsSection } from "./components/ThoughtsSection";
 import { ContactSection } from "./components/ContactSection";
 import { GameSection } from "./components/GameSection";
 import ClickSpark from "./components/ClickSpark";
 import { timelineCategories } from "./data/website";
 import { getInitialThemeMode, prefersReducedMotion } from "./utils/theme";
+import { preloadExperienceLogos, preloadToolIcons } from "./utils/backgroundAssets";
+import { createBackgroundPage } from "./utils/backgroundPage";
 import type {
   NavLink,
   PageId,
@@ -18,6 +18,13 @@ import type {
   ThemeMode,
   TimelineCategory,
 } from "./types/website";
+
+const { Page: ToolsSection, preload: loadToolsSection } = createBackgroundPage(
+  () => import("./components/ToolsSection").then((module) => ({ default: module.ToolsSection })),
+);
+const { Page: ThoughtsSection, preload: loadThoughtsSection } = createBackgroundPage(
+  () => import("./components/ThoughtsSection").then((module) => ({ default: module.ThoughtsSection })),
+);
 
 type RouteState = {
   page: PageId;
@@ -56,6 +63,12 @@ function App() {
   const [emailCopied, setEmailCopied] = useState(false);
   const experienceTouchStartRef = useRef<{ x: number; y: number } | null>(null);
   console.log("What are you doing here, go back");
+
+  useEffect(() => preloadExperienceLogos(() => {
+    void Promise.all([loadToolsSection(), loadThoughtsSection()]).then(preloadToolIcons).catch(() => {
+      // Navigation can still request the page if background loading fails.
+    });
+  }), []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = themeMode;
@@ -248,9 +261,10 @@ function App() {
             </>
           ) : null}
 
-          {activePage === "tools" ? <ToolsSection /> : null}
-
-          {activePage === "thoughts" ? <ThoughtsSection /> : null}
+          <Suspense fallback={<section className="section" role="status">Loading…</section>}>
+            {activePage === "tools" ? <ToolsSection /> : null}
+            {activePage === "thoughts" ? <ThoughtsSection /> : null}
+          </Suspense>
         </main>
       </div>
     </ClickSpark>

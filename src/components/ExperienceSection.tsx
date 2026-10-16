@@ -123,12 +123,30 @@ export function ExperienceSection({
                           entry.logo,
                         )}
                         alt={`${entry.organization} logo`}
+                        decoding="async"
+                        loading="eager"
+                        fetchPriority={activeTimeline === "education" ? "high" : "auto"}
                       />
                     </span>
                   ) : null}
                   <div>
                     <h3>
-                      <RichText text={entry.organization} />
+                      {entry.website ? (
+                        <a
+                          className="entry-title-link"
+                          href={entry.website}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`${entry.organization} website`}
+                        >
+                          <RichText text={entry.organization} />
+                          <span className="entry-link-icon" aria-hidden="true">
+                            <ExternalLinkIcon />
+                          </span>
+                        </a>
+                      ) : (
+                        <RichText text={entry.organization} />
+                      )}
                     </h3>
                     {entry.location ? (
                       <p className="meta">
@@ -137,19 +155,6 @@ export function ExperienceSection({
                     ) : null}
                   </div>
                 </div>
-                {entry.website ? (
-                  <a
-                    className="entry-site"
-                    href={entry.website}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`${entry.organization} website`}
-                  >
-                    <span className="entry-site-icon" aria-hidden="true">
-                      <ExternalLinkIcon />
-                    </span>
-                  </a>
-                ) : null}
               </header>
               {entry.roles.length > 0 ? (
                 <div

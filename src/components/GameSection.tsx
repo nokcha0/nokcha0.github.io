@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { RichText } from "./RichText";
+import { loadConfetti } from "../utils/confetti";
 
 type GridDot = {
   id: string;
@@ -19,12 +20,6 @@ type DragState = {
   pointerX: number;
   pointerY: number;
 };
-
-declare global {
-  interface Window {
-    confetti?: (options: Record<string, unknown>) => void;
-  }
-}
 
 const BOARD_SIZE = 360;
 const GRID_STEP = 70;
@@ -166,60 +161,69 @@ export function GameSection() {
   const isSolved =
     segments.length === MAX_SEGMENTS &&
     coveredDotIds.size === VISIBLE_DOTS.length;
+  const isFailed =
+    !solutionVisible && segments.length === MAX_SEGMENTS && !isSolved;
   const renderedSegments = solutionVisible ? SOLUTION_SEGMENTS : segments;
   const linesUsed = solutionVisible ? MAX_SEGMENTS : segments.length;
   const canDraw = !solutionVisible && segments.length < MAX_SEGMENTS;
 
-  const playConfetti = useCallback(() => {
-    const confetti = window.confetti;
-    if (typeof confetti !== "function") return;
-
-    const duration = 7 * 1000;
-    const animationEnd = Date.now() + duration;
-    const defaults = {
-      startVelocity: 24,
-      spread: 300,
-      ticks: 45,
-      disableForReducedMotion: false,
-      zIndex: 2147483647,
-    };
-
-    const fireBurst = (particleCount: number) => {
-      confetti(
-        Object.assign({}, defaults, {
-          count: particleCount,
-          origin: { x: randomInRange(0.1, 0.3), y: randomInRange(0, 0.25) },
-        }),
-      );
-      confetti(
-        Object.assign({}, defaults, {
-          count: particleCount,
-          origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0, 0.25) },
-        }),
-      );
-    };
-
-    const intervalId = window.setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        window.clearInterval(intervalId);
-        return;
-      }
-
-      const particleCount = 18 * (timeLeft / duration);
-      fireBurst(particleCount);
-    }, 350);
-
-    fireBurst(28);
-    window.setTimeout(() => window.clearInterval(intervalId), duration + 100);
-  }, []);
+  const startGame = () => {
+    setGameStarted(true);
+    void loadConfetti().catch(() => {
+      // Keep the puzzle playable; a win can retry the optional effect.
+    });
+  };
 
   useEffect(() => {
     if (!isSolved) return;
+    let cancelled = false;
+    let intervalId: number | undefined;
 
-    playConfetti();
-  }, [isSolved, playConfetti]);
+    const celebrate = async () => {
+      try {
+        const confetti = await loadConfetti();
+        if (cancelled) return;
+
+        const duration = 7 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = {
+          startVelocity: 24,
+          spread: 300,
+          ticks: 45,
+          disableForReducedMotion: false,
+          zIndex: 2147483647,
+        };
+        const fireBurst = (particleCount: number) => {
+          confetti({
+            ...defaults,
+            count: particleCount,
+            origin: { x: randomInRange(0.1, 0.3), y: randomInRange(0, 0.25) },
+          });
+          confetti({
+            ...defaults,
+            count: particleCount,
+            origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0, 0.25) },
+          });
+        };
+        intervalId = window.setInterval(() => {
+          const timeLeft = animationEnd - Date.now();
+          if (timeLeft <= 0) {
+            window.clearInterval(intervalId);
+            return;
+          }
+          fireBurst(18 * (timeLeft / duration));
+        }, 350);
+        fireBurst(28);
+      } catch {
+        // A failed optional effect must not interrupt the solved game.
+      }
+    };
+    void celebrate();
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [isSolved]);
 
   const getLocalPoint = (event: ReactPointerEvent<SVGSVGElement>) => {
     const svgElement = svgRef.current;
@@ -425,24 +429,27 @@ export function GameSection() {
         <h2 id="puzzle-title">Thanks for Coming.</h2>
         <div className="puzzle-invite-row">
           {!gameStarted ? (
-            <>
+            <div className="puzzle-invite-prompt">
               <p className="puzzle-invite-text">
                 Do you want to solve a small puzzle?
               </p>
               <button
                 type="button"
                 className="puzzle-button"
-                onClick={() => setGameStarted(true)}
+                onClick={startGame}
               >
                 Yes
               </button>
-            </>
+            </div>
           ) : (
             <>
               <span className="puzzle-summary-text">
-                <RichText text="Can you cover all 9 dots with four [[consecutive|without lifting the pen.]] straight lines?" />
+                <RichText text="Can you cover all 9 dots with four [[consecutive|&quot;without lifting the pen&quot;.]] straight lines?" />
               </span>
-              <span className="puzzle-count" aria-live="polite">
+              <span
+                className={`puzzle-count${isFailed ? " is-failed" : ""}`}
+                aria-live="polite"
+              >
                 {linesUsed} / {MAX_SEGMENTS}
               </span>
             </>
@@ -469,7 +476,7 @@ export function GameSection() {
                 onClick={openSolutionFlow}
                 disabled={solutionVisible}
               >
-                See solution
+                Give up
               </button>
               <div
                 className={`puzzle-confirmation-slot ${

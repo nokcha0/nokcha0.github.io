@@ -37,6 +37,7 @@ function ClickSpark({
 }: ClickSparkProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sparksRef = useRef<Spark[]>([]);
+  const startAnimationRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -101,6 +102,7 @@ function ClickSpark({
     let animationId = 0;
 
     const draw = (timestamp: number) => {
+      animationId = 0;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       sparksRef.current = sparksRef.current.filter((spark) => {
@@ -129,11 +131,23 @@ function ClickSpark({
         return true;
       });
 
-      animationId = window.requestAnimationFrame(draw);
+      if (sparksRef.current.length > 0) {
+        animationId = window.requestAnimationFrame(draw);
+      }
     };
 
-    animationId = window.requestAnimationFrame(draw);
-    return () => window.cancelAnimationFrame(animationId);
+    const startAnimation = () => {
+      if (animationId === 0 && sparksRef.current.length > 0) {
+        animationId = window.requestAnimationFrame(draw);
+      }
+    };
+    startAnimationRef.current = startAnimation;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    startAnimation();
+    return () => {
+      window.cancelAnimationFrame(animationId);
+      startAnimationRef.current = null;
+    };
   }, [
     disabled,
     duration,
@@ -171,6 +185,7 @@ function ClickSpark({
     }));
 
     sparksRef.current.push(...newSparks);
+    startAnimationRef.current?.();
   };
 
   return (

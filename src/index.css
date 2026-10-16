@@ -1,5 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+/* Keep Korean fallback text from enlarging Firefox's selection rectangles. */
+@font-face {
+  font-family: "About Korean";
+  src:
+    local("Malgun Gothic"),
+    local("Apple SD Gothic Neo"),
+    local("Noto Sans CJK KR"),
+    local("Noto Sans KR");
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
 
+/* Neutral surroundings and muted sage accents. */
 :root {
   --bg: #100f0f;
   --surface: #1c1b1a;
@@ -11,13 +23,18 @@
   --date-text: #b7b5ac;
   --border: rgb(87 86 83 / 48%);
   --border-strong: rgb(159 157 150 / 44%);
-  --accent: #87d3c3;
-  --focus-ring: rgb(135 211 195 / 55%);
-  --selection: rgb(30 95 91 / 30%);
+  --accent: #a7b9a0;
+  --link-hover: #b8b8b8;
+  --organization-link-hover: #b7b5ac;
+  --focus-ring: rgb(167 185 160 / 65%);
+  --selection: rgb(167 189 156 / 45%);
+  --selection-text: var(--text);
   --highlight: #3a2d04;
-  --copied-border: rgb(58 169 159 / 38%);
-  --copied-bg: rgb(16 31 29 / 78%);
+  --copied-border: rgb(167 185 160 / 38%);
+  --copied-bg: rgb(25 29 24 / 78%);
   --section-offset: 1.8rem;
+  --hover-transition: 160ms ease-in-out;
+  --button-hover-edge: rgb(167 185 160 / 14%);
   --font-sans:
     "Inter", -apple-system, BlinkMacSystemFont, "IBM Plex Sans", "Segoe UI",
     Helvetica, Arial, sans-serif;
@@ -43,12 +60,15 @@
   --date-text: #575653;
   --border: rgb(206 205 195 / 92%);
   --border-strong: rgb(183 181 172 / 92%);
-  --accent: #24837b;
-  --focus-ring: rgb(36 131 123 / 36%);
-  --selection: rgb(187 220 206 / 32%);
+  --accent: #566b52;
+  --link-hover: #575757;
+  --organization-link-hover: #6f6e69;
+  --button-hover-edge: rgb(86 107 82 / 12%);
+  --focus-ring: rgb(86 107 82 / 50%);
+  --selection: rgb(167 189 156 / 32%);
   --highlight: #f6e2a0;
-  --copied-border: rgb(58 169 159 / 28%);
-  --copied-bg: rgb(221 241 228 / 92%);
+  --copied-border: rgb(86 107 82 / 28%);
+  --copied-bg: rgb(237 241 233 / 92%);
 
   color-scheme: light;
 }
@@ -61,6 +81,7 @@
 
 *::selection {
   background: var(--selection);
+  color: var(--selection-text);
 }
 
 html,

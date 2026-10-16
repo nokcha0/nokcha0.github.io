@@ -18,7 +18,7 @@ export function ToolsSection() {
               {group.tools.map((tool) => (
                 <article className="tool-item" key={tool.name}>
                   <span className="tool-icon" aria-hidden="true">
-                    <img src={tool.icon} alt="" />
+                    <img src={tool.icon} alt="" loading="lazy" decoding="async" />
                   </span>
                   <div className="tool-copy">
                     <p className="tool-name">{tool.name}</p>

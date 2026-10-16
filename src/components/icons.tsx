@@ -29,8 +29,9 @@ export function ContactIcon({ label }: ContactIconProps) {
     );
   }
 
+  // Center the GitHub outline's actual bounds, including the ears above y=0.
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
+    <svg viewBox="-0.35 -1.62 24 24" aria-hidden="true">
       <path d="M9 19c-4.5 1.4-4.5-2.5-6.3-3" />
       <path d="M15 21v-3.9a3.4 3.4 0 0 0-1-2.6c3.3-.4 6.8-1.6 6.8-7.1a5.5 5.5 0 0 0-1.5-3.8 5.1 5.1 0 0 0-.1-3.8s-1.2-.4-4 1.5a13.8 13.8 0 0 0-7.2 0c-2.8-1.9-4-1.5-4-1.5a5.1 5.1 0 0 0-.1 3.8A5.5 5.5 0 0 0 2.5 7.4c0 5.5 3.5 6.7 6.8 7.1a3.4 3.4 0 0 0-1 2.6V21" />
     </svg>

@@ -18,7 +18,7 @@ export function ContactSection({ emailCopied, onEmailCopy }: ContactSectionProps
               <tr key={link.label} className="contact-row">
                 <th scope="row" className="contact-label-cell">
                   <span className="contact-main">
-                    <span className="contact-icon">
+                    <span className={`contact-icon${link.label === "GitHub" ? " contact-icon-github" : ""}`}>
                       <ContactIcon label={link.label} />
                     </span>
                     <span>{link.label}</span>

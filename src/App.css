@@ -21,6 +21,7 @@
 }
 
 .floating-nav .nav-home {
+  position: relative;
   display: inline-flex;
   align-items: center;
   color: var(--text);
@@ -32,8 +33,178 @@
   white-space: nowrap;
 }
 
-.floating-nav .nav-home:hover {
+.nav-home-label {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  white-space: pre;
+}
+
+.name-hover-graphics {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.name-hover-underline {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 1px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+}
+
+.name-hover-highlight {
+  position: absolute;
+  inset: 2px -3px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  transform: scaleX(0);
+}
+
+.name-hover-scan {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: -3px;
+  width: 1px;
+  background: var(--accent);
+  transform: scaleY(0);
+}
+
+.name-hover-corner {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border: solid var(--accent);
+  border-width: 0;
+  transform: scale(0);
+}
+
+.name-hover-corner.top-left {
+  top: -3px;
+  left: -6px;
+  border-width: 1px 0 0 1px;
+  transform-origin: top left;
+}
+
+.name-hover-corner.top-right {
+  top: -3px;
+  right: -6px;
+  border-width: 1px 1px 0 0;
+  transform-origin: top right;
+}
+
+.name-hover-corner.bottom-left {
+  bottom: -3px;
+  left: -6px;
+  border-width: 0 0 1px 1px;
+  transform-origin: bottom left;
+}
+
+.name-hover-corner.bottom-right {
+  bottom: -3px;
+  right: -6px;
+  border-width: 0 1px 1px 0;
+  transform-origin: bottom right;
+}
+
+.name-hover-letters {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  visibility: hidden;
+  color: var(--text);
+}
+
+.name-hover-letter {
+  display: inline-block;
+  white-space: pre;
+  transform-origin: center bottom;
+}
+
+.nav-home[data-name-letter-mode="true"] .nav-home-label {
+  visibility: hidden;
+}
+
+.nav-home[data-name-letter-mode="true"] .name-hover-letters {
+  visibility: visible;
+}
+
+.name-hover-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
   color: var(--accent);
+  white-space: pre;
+  clip-path: inset(0 100% 0 -30%);
+}
+
+.name-hover-greeting {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 8px);
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--accent);
+  border-radius: 99px;
+  background: var(--bg);
+  color: var(--accent);
+  font-size: 0.6rem;
+  line-height: 1;
+  transform: translate(-4px, -50%) scale(0);
+  transform-origin: left center;
+}
+
+.name-hover-confetti {
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 9px;
+  border-radius: 1px;
+  background: var(--accent);
+  transform: scale(0);
+}
+
+.name-hover-confetti:nth-of-type(even) {
+  background: light-dark(#8b5719, #e5bd78);
+}
+
+.name-hover-marker {
+  position: absolute;
+  inset: -8px -11px;
+  width: calc(100% + 22px);
+  height: calc(100% + 16px);
+  overflow: visible;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.name-hover-marker path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+.name-hover-pixels {
+  position: absolute;
+  inset: 0 -3px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.name-hover-pixel {
+  background: var(--accent);
+  transform: scale(0);
 }
 
 .floating-nav .nav-home:focus-visible {
@@ -72,12 +243,16 @@
   font-weight: inherit;
   color: var(--text-muted);
   line-height: 1;
-  transition: color 180ms ease;
+  transition: color var(--hover-transition);
 }
 
-.floating-nav a:hover,
 .floating-nav a.is-active {
   color: var(--text);
+}
+
+.floating-nav .section-nav-item a:hover,
+.floating-nav .section-nav-item a:focus-visible {
+  color: var(--link-hover);
 }
 
 .floating-nav a:focus-visible {
@@ -203,6 +378,7 @@ h3 {
 
 .intro .summary {
   color: var(--text-soft);
+  font-family: "Inter", "About Korean", var(--font-sans);
   font-size: 1.06rem;
   line-height: 1.72;
   text-align: justify;
@@ -231,12 +407,21 @@ h3 {
   text-decoration-style: dotted;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.16em;
+  transition:
+    color var(--hover-transition),
+    text-decoration-color var(--hover-transition);
 }
 
 .inline-note.is-visible .inline-note-trigger,
 .inline-note-trigger:hover,
 .inline-note-trigger:focus-visible {
   color: var(--text);
+  text-decoration-color: var(--text);
+}
+
+.intro .inline-note-trigger,
+.intro .inline-note.is-visible .inline-note-trigger {
+  text-decoration-color: var(--accent);
 }
 
 .inline-note-trigger:focus-visible {
@@ -268,9 +453,9 @@ h3 {
   pointer-events: none;
   z-index: 5;
   transition:
-    opacity 160ms ease,
-    transform 160ms ease,
-    visibility 160ms ease;
+    opacity var(--hover-transition),
+    transform var(--hover-transition),
+    visibility var(--hover-transition);
 }
 
 .inline-note.is-visible .inline-note-bubble {
@@ -278,6 +463,11 @@ h3 {
   visibility: visible;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
+}
+
+.intro .inline-note-bubble {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .intro-contact-links {
@@ -288,22 +478,19 @@ h3 {
 }
 
 .intro-contact-links a {
+  position: relative;
   width: 2rem;
   height: 2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: 7px;
-  background: var(--surface);
+  background: var(--bg);
   color: var(--text-soft);
-  transition:
-    border-color 160ms ease,
-    background-color 160ms ease,
-    color 160ms ease;
 }
 
-.intro-contact-links a svg {
+.intro-contact-links a > svg:not(.contact-border) {
   width: 1rem;
   height: 1rem;
   fill: none;
@@ -313,10 +500,21 @@ h3 {
   stroke-linejoin: round;
 }
 
-.intro-contact-links a:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
-  background: var(--surface-2);
+.contact-border {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1;
+  pointer-events: none;
+  transform: rotate(var(--border-rotation, 0deg));
+}
+
+.contact-border rect {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
 }
 
 .intro-contact-links a:focus-visible {
@@ -440,8 +638,8 @@ h3 {
   min-height: 2.35rem;
   padding: 0;
   transition:
-    color 160ms ease,
-    opacity 160ms ease;
+    color var(--hover-transition),
+    opacity var(--hover-transition);
 }
 
 .tool-item:hover {
@@ -564,9 +762,6 @@ h3 {
   border-radius: 14px;
   padding: 1.1rem 1rem;
   background: transparent;
-  transition:
-    border-color 160ms ease,
-    background-color 160ms ease;
 }
 
 .experience-list header {
@@ -584,11 +779,6 @@ h3 {
   min-width: 0;
 }
 
-.experience-list article:hover {
-  border-color: var(--border-strong);
-  background: var(--surface);
-}
-
 .entry-head-main {
   display: flex;
   align-items: center;
@@ -602,7 +792,6 @@ h3 {
   position: relative;
   border-radius: 10px;
   background: transparent;
-  border: 1px solid var(--border);
   overflow: hidden;
 }
 
@@ -627,52 +816,46 @@ h3 {
   overflow-wrap: anywhere;
 }
 
-.entry-site {
-  width: 2.05rem;
-  height: 2.05rem;
-  flex: 0 0 2.05rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0;
-  color: var(--text-muted);
-  background: transparent;
+.entry-title-link {
+  color: inherit;
   text-decoration: none;
-  transition:
-    border-color 160ms ease,
-    color 160ms ease,
-    background-color 160ms ease;
+  transition: color var(--hover-transition);
 }
 
-.entry-site-icon {
-  width: 1.45rem;
-  height: 1.45rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.entry-title-link:hover,
+.entry-title-link:focus-visible {
+  color: var(--organization-link-hover);
 }
 
-.entry-site-icon svg {
-  width: 0.84rem;
-  height: 0.84rem;
+.entry-title-link:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.entry-link-icon {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  margin-left: 0.3em;
+  vertical-align: -0.08em;
+  color: var(--text-muted);
+  transition: color var(--hover-transition);
+}
+
+.entry-link-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.9;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.entry-site:hover {
-  color: var(--text-soft);
-  border-color: var(--border-strong);
-  background: var(--surface);
-}
-
-.entry-site:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+.entry-title-link:hover .entry-link-icon,
+.entry-title-link:focus-visible .entry-link-icon {
+  color: var(--organization-link-hover);
 }
 
 .role-list {
@@ -755,6 +938,10 @@ h3 {
   stroke-linejoin: round;
 }
 
+.contact-icon-github {
+  transform: translateX(2px);
+}
+
 .contact-action {
   width: 100%;
   display: flex;
@@ -772,7 +959,9 @@ h3 {
 }
 
 .contact-action:hover .contact-value,
-.contact-action:hover .contact-status {
+.contact-action:hover .contact-status,
+.contact-action:focus-visible .contact-value,
+.contact-action:focus-visible .contact-status {
   color: var(--text);
 }
 
@@ -791,12 +980,14 @@ h3 {
   line-height: 1.35;
   overflow-wrap: anywhere;
   word-break: break-word;
+  transition: color var(--hover-transition);
 }
 
 .contact-status {
   color: var(--text-muted);
   font-size: 0.84rem;
   white-space: nowrap;
+  transition: color var(--hover-transition);
 }
 
 .puzzle-section {
@@ -825,6 +1016,13 @@ h3 {
   color: var(--text-muted);
   font-size: 0.95rem;
   line-height: 1.45;
+}
+
+.puzzle-invite-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
 }
 
 .puzzle-idle-spacer {
@@ -867,11 +1065,42 @@ h3 {
 }
 
 .puzzle-count {
+  display: inline-block;
   margin: 0;
-  color: #fff;
+  color: var(--text);
   font-size: 0.92rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.puzzle-count.is-failed {
+  animation:
+    puzzle-count-flash 650ms ease-out,
+    puzzle-count-shake 450ms ease-in-out;
+}
+
+@keyframes puzzle-count-flash {
+  15%,
+  65% {
+    color: #e05252;
+  }
+}
+
+@keyframes puzzle-count-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-3px) rotate(-2deg);
+  }
+
+  40%,
+  80% {
+    transform: translateX(3px) rotate(2deg);
+  }
 }
 
 .puzzle-actions {
@@ -898,19 +1127,20 @@ h3 {
   font: inherit;
   font-size: 0.9rem;
   line-height: 1.2;
+  white-space: nowrap;
   padding: 0.45rem 0.8rem;
   cursor: pointer;
   pointer-events: auto;
+  box-shadow: inset 0 0 0 1px transparent;
   transition:
-    border-color 160ms ease,
-    color 160ms ease,
-    background-color 160ms ease;
+    border-color var(--hover-transition),
+    box-shadow var(--hover-transition);
 }
 
-.puzzle-button:hover:not(:disabled) {
-  color: var(--text);
-  border-color: var(--border-strong);
-  background: var(--surface);
+.puzzle-button:hover:not(:disabled),
+.puzzle-button:focus-visible:not(:disabled) {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--button-hover-edge);
 }
 
 .puzzle-button:focus-visible {
@@ -1199,7 +1429,7 @@ h3 {
 
   .experience-list header {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.75rem;
   }
 
@@ -1339,15 +1569,25 @@ h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .puzzle-count.is-failed {
+    animation: puzzle-count-flash 650ms ease-out;
+  }
+
   .floating-nav a,
   .floating-nav .nav-home,
   .theme-toggle,
+  .inline-note-trigger,
   .inline-note-bubble,
+  .intro-contact-links a,
+  .contact-border rect,
+  .entry-title-link,
+  .entry-link-icon,
   .contact-action,
+  .contact-value,
+  .contact-status,
   .puzzle-button,
   .tool-item,
   .timeline-switcher button,
-  .experience-list article,
   .experience-list-shell {
     transition: none;
   }

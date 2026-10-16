@@ -36,8 +36,8 @@ export const navLinks: readonly NavLink[] = [
 export const introContent = {
   role: "About",
   summaries: [
-    "Hello [[{{visitorOrdinal}} visitor|I just made this up. This page is static and doesn't track you.]]. My name is Joonhyun. It could be a bit tricky to pronounce, so you can call me [[Joon|Like the month June.]].",
-    "My full Korean name is 장준현. Online, I like to go by **nokcha0**, which means [[green tea in Korean|nok = 녹, cha = 차. Together: 녹차.]]. The name came from a cup of green tea sitting on my desk while I was signing up for GitHub. The 0 is a tiny tribute to the fact that nokcha was already taken.",
+    "Hello [[{{visitorOrdinal}} visitor| I just made this up. This page doesn't track you.]]. My name is Joonhyun. It could be a bit tricky to pronounce, so you can call me [[Joon|Like the month June.]].",
+    "My full Korean name is 장준현. Online, I use the username **nokcha0**, which means [[green tea in Korean|nok = 녹, cha = 차. Together: 녹차.]]. The name came from a cup of green tea sitting on my desk while I was signing up for GitHub. The 0 is a tiny tribute to the fact that nokcha was already taken.",
     "I'm currently based in Montréal, studying Software Engineering at McGill University. ",
   ],
 };
@@ -85,7 +85,7 @@ export const timelines: Record<TimelineCategory, TimelineEntry[]> = {
       roles: [
         {
           title: "Software Engineering Intern - Analytics, Streaming Infra",
-          dates: "May 2026 - Present",
+          dates: "May 2026 - Aug 2026",
         },
         {
           title: "Software Engineering Intern - Core, Checkout Customizations",
@@ -114,11 +114,15 @@ export const timelines: Record<TimelineCategory, TimelineEntry[]> = {
       website: "https://mcgillrocketteam.com",
       roles: [
         {
-          title: "Software Developer - Orbital CubeSat",
-          dates: "Sep 2025 - Present",
+          title: "Ground Station Controls",
+          dates: "Sep 2026 - Present",
         },
         {
-          title: "Software Developer - Avionics",
+          title: "Orbital CubeSat",
+          dates: "Sep 2025 - Aug 2026",
+        },
+        {
+          title: "Avionics",
           dates: "Sep 2024 - Aug 2025",
         },
       ],
