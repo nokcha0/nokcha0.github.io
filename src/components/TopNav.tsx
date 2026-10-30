@@ -1,13 +1,15 @@
+import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { navLinks } from "../data/website";
 import { ThemeIcon } from "./icons";
 import type { NavLink, PageId, ThemeMode } from "../types/website";
-import { animateNameHover, resetNameHover } from "../utils/nameHover";
+import { animateNameHover, animateNameTap, clearNameAnimation, resetNameHover } from "../utils/nameHover";
 
 type TopNavProps = {
   activePage: PageId;
   themeMode: ThemeMode;
   onNavClick: (event: MouseEvent<HTMLAnchorElement>, link: NavLink) => void;
+  onPreparePage: (page: PageId) => void;
   onThemeToggle: () => void;
 };
 
@@ -15,27 +17,90 @@ export function TopNav({
   activePage,
   themeMode,
   onNavClick,
+  onPreparePage,
   onThemeToggle,
 }: TopNavProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 640px)").matches);
+  const headerRef = useRef<HTMLElement | null>(null);
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const menuId = useId();
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 640px)");
+    const onChange = () => setIsMobile(query.matches);
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    const name = headerRef.current?.querySelector<HTMLElement>(".nav-home");
+    return () => { if (name) clearNameAnimation(name); };
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = () => setMenuOpen(false);
+    const onPointerDown = (event: PointerEvent) => {
+      if (!headerRef.current?.contains(event.target as Node)) close();
+    };
+    const wideScreen = window.matchMedia("(min-width: 641px)");
+    document.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("hashchange", close);
+    wideScreen.addEventListener("change", close);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("hashchange", close);
+      wideScreen.removeEventListener("change", close);
+    };
+  }, [menuOpen]);
+
+  const navigate = (event: MouseEvent<HTMLAnchorElement>, link: NavLink) => {
+    setMenuOpen(false);
+    onNavClick(event, link);
+  };
   const isActiveLink = (link: NavLink) => activePage === link.id;
+  const NameControl = isMobile ? "button" : "a";
 
   return (
-    <header className="floating-nav" aria-label="Primary">
-      <a
-        href="#/"
-        className="nav-home"
-        onClick={(event) =>
-          onNavClick(event, { id: "home", label: "Home", href: "#/" })
+    <header
+      ref={headerRef}
+      className="floating-nav"
+      aria-label="Primary"
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && menuOpen) {
+          event.preventDefault();
+          setMenuOpen(false);
+          menuButtonRef.current?.focus();
         }
-        aria-label="Joonhyun Chang"
-        onPointerEnter={animateNameHover}
-        onPointerLeave={resetNameHover}
+      }}
+    >
+      <NameControl
+        href={isMobile ? undefined : "#/"}
+        type={isMobile ? "button" : undefined}
+        className="nav-home"
+        onClick={(event) => {
+          if (isMobile) {
+            animateNameTap(event);
+          } else {
+            navigate(event as MouseEvent<HTMLAnchorElement>, { id: "home", label: "Home", href: "#/" });
+          }
+        }}
+        aria-label={isMobile ? "Joonhyun Chang — play an animation" : "Joonhyun Chang"}
+        onPointerEnter={(event) => {
+          if (!isMobile && event.pointerType !== "touch") animateNameHover(event);
+        }}
+        onPointerLeave={(event) => {
+          if (!isMobile) resetNameHover(event);
+        }}
         onFocus={(event) => {
-          if (event.currentTarget.matches(":focus-visible")) {
+          if (!isMobile && event.currentTarget.matches(":focus-visible")) {
             animateNameHover(event);
           }
         }}
-        onBlur={resetNameHover}
+        onBlur={(event) => {
+          if (!isMobile) resetNameHover(event);
+        }}
       >
         <span className="nav-home-label" data-name-part="">Joonhyun Chang</span>
         <span className="name-hover-graphics" aria-hidden="true">
@@ -65,14 +130,29 @@ export function TopNav({
             ))}
           </span>
         </span>
-      </a>
-      <nav>
+      </NameControl>
+      <button
+        ref={menuButtonRef}
+        type="button"
+        className="mobile-menu-toggle"
+        aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+        aria-expanded={menuOpen}
+        aria-controls={menuId}
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d={menuOpen ? "m6 6 12 12M18 6 6 18" : "M4 6h16M4 12h16M4 18h16"} />
+        </svg>
+      </button>
+      <nav id={menuId} className={menuOpen ? "is-open" : ""} aria-label="Main navigation">
         <ul>
           {navLinks.map((link) => (
             <li key={link.id} className="section-nav-item">
               <a
                 href={link.href}
-                onClick={(event) => onNavClick(event, link)}
+                onClick={(event) => navigate(event, link)}
+                onPointerEnter={() => onPreparePage(link.id)}
+                onFocus={() => onPreparePage(link.id)}
                 className={isActiveLink(link) ? "is-active" : ""}
                 aria-current={isActiveLink(link) ? "page" : undefined}
               >
@@ -80,24 +160,24 @@ export function TopNav({
               </a>
             </li>
           ))}
-          <li className="theme-toggle-item nav-control-item">
-            <button
-              type="button"
-              className="theme-toggle"
-              onClick={onThemeToggle}
-              aria-label={
-                themeMode === "dark"
-                  ? "Switch to light mode"
-                  : "Switch to dark mode"
-              }
-            >
-              <span className="theme-toggle-icon">
-                <ThemeIcon mode={themeMode} />
-              </span>
-            </button>
-          </li>
         </ul>
       </nav>
+      <span className="theme-toggle-slot">
+        <button
+          type="button"
+          className="theme-toggle"
+          onClick={onThemeToggle}
+          aria-label={
+            themeMode === "dark"
+              ? "Switch to light mode"
+              : "Switch to dark mode"
+          }
+        >
+          <span className="theme-toggle-icon">
+            <ThemeIcon mode={themeMode} />
+          </span>
+        </button>
+      </span>
     </header>
   );
 }

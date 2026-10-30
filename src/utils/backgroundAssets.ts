@@ -21,7 +21,7 @@ function loadImage(src: string): Promise<void> {
   return ready;
 }
 
-export function preloadExperienceLogos(onLoaded: () => void) {
+export function preloadSiteAssets(preloadPages: () => void) {
   let cancelled = false;
   let idleId: number | undefined;
   let timeoutId: number | undefined;
@@ -35,22 +35,21 @@ export function preloadExperienceLogos(onLoaded: () => void) {
   };
 
   const load = () => {
+    if (cancelled) return;
     const sources = new Set(Object.values(timelines).flatMap((entries) =>
       entries.flatMap((entry) => [entry.logo, entry.logoDark, entry.logoLight]),
     ));
     const pending = [...sources].filter((src): src is string => Boolean(src)).map(loadImage);
-    void Promise.all(pending).then(() => {
-      if (!cancelled) schedule(onLoaded);
-    });
+    void Promise.all(pending);
+    // A slow or failed image must not delay warming up page navigation.
+    schedule(() => { if (!cancelled) preloadPages(); });
   };
-  const start = () => schedule(load);
-
-  if (document.readyState === "complete") start();
-  else window.addEventListener("load", start, { once: true });
+  // Wait for a paint and an idle slot, not for every image on the page.
+  const frameId = window.requestAnimationFrame(() => schedule(load));
 
   return () => {
     cancelled = true;
-    window.removeEventListener("load", start);
+    window.cancelAnimationFrame(frameId);
     if (idleId !== undefined) window.cancelIdleCallback(idleId);
     window.clearTimeout(timeoutId);
   };

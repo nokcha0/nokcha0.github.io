@@ -28,8 +28,8 @@ function animateContactBorder(event: SyntheticEvent<HTMLAnchorElement>) {
   link.style.setProperty("--border-rotation", Math.random() < 0.5 ? "0deg" : "180deg");
   border.animate(
     [
-      { strokeDasharray: effect.dashes[0], strokeDashoffset: `${effect.start}` },
-      { strokeDasharray: effect.dashes[1], strokeDashoffset: "0" },
+      { strokeDasharray: effect.dashes[0], strokeDashoffset: `${effect.start}`, opacity: 1 },
+      { strokeDasharray: effect.dashes[1], strokeDashoffset: "0", opacity: 1 },
     ],
     {
       duration: reducedMotion ? 0 : 480,
@@ -44,6 +44,11 @@ function resetContactBorder(event: SyntheticEvent<HTMLAnchorElement>) {
   if (link.matches(":hover, :focus-visible")) return;
   delete link.dataset.borderActive;
   link.querySelector(".contact-border rect")?.getAnimations().forEach((animation) => {
+    if (animation.effect?.getTiming().duration === 0) {
+      animation.cancel();
+      return;
+    }
+    animation.onfinish = () => animation.cancel();
     animation.reverse();
   });
 }
@@ -118,7 +123,6 @@ export function IntroSection() {
             >
               <svg
                 className="contact-border"
-                viewBox="0 0 32 32"
                 aria-hidden="true"
               >
                 <rect

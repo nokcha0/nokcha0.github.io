@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useId, useRef, useState } from "react";
+import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type {
   FocusEvent,
   KeyboardEvent,
@@ -18,6 +18,7 @@ type InlineNoteProps = {
 
 function InlineNote({ label, tooltip, keyPrefix }: InlineNoteProps) {
   const wrapperRef = useRef<HTMLSpanElement | null>(null);
+  const bubbleRef = useRef<HTMLSpanElement | null>(null);
   const tooltipId = useId();
   const [isHovered, setIsHovered] = useState(false);
   const [hasFocusWithin, setHasFocusWithin] = useState(false);
@@ -26,19 +27,54 @@ function InlineNote({ label, tooltip, keyPrefix }: InlineNoteProps) {
 
   const isVisible = isPinnedOpen || ((isHovered || hasFocusWithin) && !isSuppressed);
 
+  useLayoutEffect(() => {
+    if (!isVisible) return;
+
+    const keepBubbleOnScreen = () => {
+      const bubble = bubbleRef.current;
+      if (!bubble) return;
+
+      bubble.style.removeProperty("--note-shift");
+      if (!window.matchMedia("(max-width: 640px)").matches) return;
+
+      const bounds = bubble.getBoundingClientRect();
+      const gutter = 16;
+      const shift = Math.max(
+        gutter - bounds.left,
+        Math.min(0, window.innerWidth - gutter - bounds.right),
+      );
+      bubble.style.setProperty("--note-shift", `${shift}px`);
+    };
+
+    keepBubbleOnScreen();
+    window.addEventListener("resize", keepBubbleOnScreen);
+    return () => window.removeEventListener("resize", keepBubbleOnScreen);
+  }, [isVisible]);
+
   useEffect(() => {
-    if (!isPinnedOpen) return;
+    if (!isVisible) return;
+
+    const dismiss = () => {
+      setIsPinnedOpen(false);
+      setIsHovered(false);
+      setHasFocusWithin(false);
+      setIsSuppressed(true);
+    };
 
     const onPointerDown = (event: PointerEvent) => {
       if (!wrapperRef.current?.contains(event.target as Node)) {
-        setIsPinnedOpen(false);
-        setIsSuppressed(false);
+        dismiss();
       }
     };
 
     document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [isPinnedOpen]);
+    // Touch scrolling cancels the tap and should also dismiss its popup.
+    document.addEventListener("pointercancel", dismiss);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("pointercancel", dismiss);
+    };
+  }, [isVisible]);
 
   const toggleTooltip = (event?: ReactMouseEvent<HTMLSpanElement>) => {
     if (isPinnedOpen) {
@@ -83,8 +119,13 @@ function InlineNote({ label, tooltip, keyPrefix }: InlineNoteProps) {
       className={`inline-note ${isVisible ? "is-visible" : ""} ${
         isPinnedOpen ? "is-open" : ""
       }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
+      onPointerEnter={(event) => {
+        if (event.pointerType === "touch") return;
+        setIsHovered(true);
+        setIsSuppressed(false);
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "touch") return;
         setIsHovered(false);
         setIsSuppressed(false);
       }}
@@ -104,7 +145,7 @@ function InlineNote({ label, tooltip, keyPrefix }: InlineNoteProps) {
           {renderSegments(label, `${keyPrefix}-label`)}
         </span>
       </span>
-      <span id={tooltipId} className="inline-note-bubble" role="tooltip">
+      <span ref={bubbleRef} id={tooltipId} className="inline-note-bubble" role="tooltip">
         {renderSegments(tooltip, `${keyPrefix}-text`)}
       </span>
     </span>

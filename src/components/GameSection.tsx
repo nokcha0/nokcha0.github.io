@@ -166,6 +166,12 @@ export function GameSection() {
   const renderedSegments = solutionVisible ? SOLUTION_SEGMENTS : segments;
   const linesUsed = solutionVisible ? MAX_SEGMENTS : segments.length;
   const canDraw = !solutionVisible && segments.length < MAX_SEGMENTS;
+  const allowedEndDots = segments.length === 0 ? VISIBLE_DOTS : ALL_DOTS;
+  const allowedStartDots = segments.length === 0
+    ? VISIBLE_DOTS
+    : [getDot(segments[segments.length - 1].endId)].filter(
+        (dot): dot is GridDot => dot !== null,
+      );
 
   const startGame = () => {
     setGameStarted(true);
@@ -302,13 +308,7 @@ export function GameSection() {
     if (!canDraw) return;
 
     const point = getLocalPoint(event);
-    const allowedStarts =
-      segments.length === 0
-        ? VISIBLE_DOTS
-        : [getDot(segments[segments.length - 1].endId)].filter(
-            (dot): dot is GridDot => dot !== null,
-          );
-    const startDot = findNearestDot(point.x, point.y, allowedStarts, (dot) =>
+    const startDot = findNearestDot(point.x, point.y, allowedStartDots, (dot) =>
       dot.visible ? VISIBLE_SNAP_RADIUS : CARRY_DOT_SNAP_RADIUS,
     );
 
@@ -330,7 +330,7 @@ export function GameSection() {
     event.preventDefault();
     const point = getLocalPoint(event);
     const startDot = getDot(dragState.startDotId);
-    const targetDot = findNearestDot(point.x, point.y, ALL_DOTS);
+    const targetDot = findNearestDot(point.x, point.y, allowedEndDots);
     const endX = targetDot ? targetDot.x : point.x;
     const endY = targetDot ? targetDot.y : point.y;
 
@@ -376,7 +376,7 @@ export function GameSection() {
     const point = getLocalPoint(event);
     const startDot = getDot(dragState.startDotId);
     const endDot = shouldCommit
-      ? findNearestDot(point.x, point.y, ALL_DOTS)
+      ? findNearestDot(point.x, point.y, allowedEndDots)
       : null;
 
     if (
@@ -416,7 +416,7 @@ export function GameSection() {
   const previewStartDot = dragState ? getDot(dragState.startDotId) : null;
   const previewEndDot =
     dragState !== null
-      ? findNearestDot(dragState.pointerX, dragState.pointerY, ALL_DOTS)
+      ? findNearestDot(dragState.pointerX, dragState.pointerY, allowedEndDots)
       : null;
   const carryDot =
     !solutionVisible && dragState === null && segments.length > 0
@@ -592,6 +592,22 @@ export function GameSection() {
                   />
                 </g>
               ))}
+              {/* HTML targets let touch-action distinguish drawing from scrolling the SVG. */}
+              {canDraw ? allowedStartDots.map((dot) => {
+                const radius = dot.visible ? VISIBLE_SNAP_RADIUS : CARRY_DOT_SNAP_RADIUS;
+                return (
+                  <foreignObject
+                    key={`hit-${dot.id}`}
+                    x={dot.x - radius}
+                    y={dot.y - radius}
+                    width={2 * radius}
+                    height={2 * radius}
+                    aria-hidden="true"
+                  >
+                    <div className="puzzle-hit-target" />
+                  </foreignObject>
+                );
+              }) : null}
             </svg>
           </div>
         </div>

@@ -1,5 +1,5 @@
-import { Suspense, useEffect, useRef, useState } from "react";
-import type { KeyboardEvent, MouseEvent, TouchEvent } from "react";
+import { Suspense, useEffect, useState } from "react";
+import type { KeyboardEvent, MouseEvent } from "react";
 import "./App.css";
 import { TopNav } from "./components/TopNav";
 import { IntroSection } from "./components/IntroSection";
@@ -9,7 +9,7 @@ import { GameSection } from "./components/GameSection";
 import ClickSpark from "./components/ClickSpark";
 import { timelineCategories } from "./data/website";
 import { getInitialThemeMode, prefersReducedMotion } from "./utils/theme";
-import { preloadExperienceLogos, preloadToolIcons } from "./utils/backgroundAssets";
+import { preloadSiteAssets, preloadToolIcons } from "./utils/backgroundAssets";
 import { createBackgroundPage } from "./utils/backgroundPage";
 import type {
   NavLink,
@@ -25,6 +25,14 @@ const { Page: ToolsSection, preload: loadToolsSection } = createBackgroundPage(
 const { Page: ThoughtsSection, preload: loadThoughtsSection } = createBackgroundPage(
   () => import("./components/ThoughtsSection").then((module) => ({ default: module.ThoughtsSection })),
 );
+
+function preparePage(page: PageId) {
+  if (page === "tools") {
+    void loadToolsSection().then(preloadToolIcons).catch(() => {});
+  } else if (page === "thoughts") {
+    void loadThoughtsSection().catch(() => {});
+  }
+}
 
 type RouteState = {
   page: PageId;
@@ -61,18 +69,20 @@ function App() {
     getInitialThemeMode(),
   );
   const [emailCopied, setEmailCopied] = useState(false);
-  const experienceTouchStartRef = useRef<{ x: number; y: number } | null>(null);
   console.log("What are you doing here, go back");
 
-  useEffect(() => preloadExperienceLogos(() => {
-    void Promise.all([loadToolsSection(), loadThoughtsSection()]).then(preloadToolIcons).catch(() => {
-      // Navigation can still request the page if background loading fails.
-    });
+  useEffect(() => preloadSiteAssets(() => {
+    preparePage("tools");
+    preparePage("thoughts");
   }), []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = themeMode;
-    window.localStorage.setItem("theme-mode", themeMode);
+    try {
+      window.localStorage.setItem("theme-mode", themeMode);
+    } catch {
+      // Theme switching does not depend on persistence being available.
+    }
   }, [themeMode]);
 
   useEffect(() => {
@@ -87,15 +97,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (activePage !== "home") {
+    if (activePage !== "home" || !targetSection) {
       window.scrollTo({
         top: 0,
         behavior: prefersReducedMotion() ? "auto" : "smooth",
       });
       return;
     }
-
-    if (!targetSection) return;
 
     const frameId = window.requestAnimationFrame(() => {
       const section = document.getElementById(targetSection);
@@ -120,6 +128,12 @@ function App() {
       const nextRoute = getRouteFromHash();
       setActivePage(nextRoute.page);
       setTargetSection(nextRoute.section);
+      if (!nextRoute.section) {
+        window.scrollTo({
+          top: 0,
+          behavior: prefersReducedMotion() ? "auto" : "smooth",
+        });
+      }
       return;
     }
 
@@ -170,69 +184,35 @@ function App() {
     }
   };
 
-  const shiftTimeline = (direction: -1 | 1): void => {
-    setTimelineByIndex(activeTimelineIndex + direction);
-  };
-
   const onTimelineSwitcherKeyDown = (
     event: KeyboardEvent<HTMLDivElement>,
   ): void => {
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      shiftTimeline(1);
-      return;
+    let nextIndex: number;
+    switch (event.key) {
+      case "ArrowRight": nextIndex = activeTimelineIndex + 1; break;
+      case "ArrowLeft": nextIndex = activeTimelineIndex - 1; break;
+      case "Home": nextIndex = 0; break;
+      case "End": nextIndex = timelineIds.length - 1; break;
+      default: return;
     }
-
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      shiftTimeline(-1);
-      return;
-    }
-
-    if (event.key === "Home") {
-      event.preventDefault();
-      setTimelineByIndex(0);
-      return;
-    }
-
-    if (event.key === "End") {
-      event.preventDefault();
-      setTimelineByIndex(timelineIds.length - 1);
-    }
-  };
-
-  const onExperienceTouchStart = (event: TouchEvent<HTMLElement>): void => {
-    const touch = event.changedTouches[0];
-    experienceTouchStartRef.current = { x: touch.clientX, y: touch.clientY };
-  };
-
-  const onExperienceTouchEnd = (event: TouchEvent<HTMLElement>): void => {
-    const start = experienceTouchStartRef.current;
-    experienceTouchStartRef.current = null;
-    if (!start) return;
-
-    const touch = event.changedTouches[0];
-    const deltaX = touch.clientX - start.x;
-    const deltaY = touch.clientY - start.y;
-
-    if (Math.abs(deltaX) < 48 || Math.abs(deltaX) < Math.abs(deltaY)) {
-      return;
-    }
-
-    shiftTimeline(deltaX < 0 ? 1 : -1);
+    event.preventDefault();
+    const normalizedIndex = (nextIndex + timelineIds.length) % timelineIds.length;
+    setTimelineByIndex(normalizedIndex);
+    event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]')[normalizedIndex]?.focus();
   };
 
   return (
     <ClickSpark
       sparkColor={themeMode === "dark" ? "#cecdc3" : "#24837b"}
       disabled={false}
-      ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle, .puzzle-button"
+      ignoreSelector=".floating-nav .section-nav-item a, .floating-nav .theme-toggle, .mobile-menu-toggle, .experience-category-heading, .puzzle-button"
     >
       <div className="site-shell">
         <TopNav
           activePage={activePage}
           themeMode={themeMode}
           onNavClick={onNavClick}
+          onPreparePage={preparePage}
           onThemeToggle={() =>
             setThemeMode((previous) => (previous === "dark" ? "light" : "dark"))
           }
@@ -248,8 +228,6 @@ function App() {
                 themeMode={themeMode}
                 onActivateTimeline={activateTimeline}
                 onTimelineSwitcherKeyDown={onTimelineSwitcherKeyDown}
-                onExperienceTouchStart={onExperienceTouchStart}
-                onExperienceTouchEnd={onExperienceTouchEnd}
               />
 
               <ContactSection

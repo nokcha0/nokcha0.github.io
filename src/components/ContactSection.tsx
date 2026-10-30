@@ -30,6 +30,7 @@ export function ContactSection({ emailCopied, onEmailCopy }: ContactSectionProps
                       type="button"
                       className={`contact-action ${emailCopied ? "is-copied" : ""}`}
                       onClick={() => onEmailCopy(link.value)}
+                      aria-label={emailCopied ? "Email address copied" : `Copy email address ${link.value}`}
                       aria-live="polite"
                     >
                       <span className="contact-value">{link.value}</span>
@@ -43,6 +44,7 @@ export function ContactSection({ emailCopied, onEmailCopy }: ContactSectionProps
                       href={link.href}
                       target="_blank"
                       rel="noreferrer"
+                      aria-label={`Open ${link.label} profile`}
                     >
                       <span className="contact-value">{link.value}</span>
                       <span className="contact-status">Open</span>

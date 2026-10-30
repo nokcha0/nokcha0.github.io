@@ -1,7 +1,10 @@
 import type { ThemeMode } from "../types/website";
 
+let reducedMotionQuery: MediaQueryList | undefined;
+
 export function prefersReducedMotion(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  reducedMotionQuery ??= window.matchMedia("(prefers-reduced-motion: reduce)");
+  return reducedMotionQuery.matches;
 }
 
 export function getInitialThemeMode(): ThemeMode {
@@ -9,9 +12,13 @@ export function getInitialThemeMode(): ThemeMode {
     return "dark";
   }
 
-  const storedTheme = window.localStorage.getItem("theme-mode");
-  if (storedTheme === "light" || storedTheme === "dark") {
-    return storedTheme;
+  try {
+    const storedTheme = window.localStorage.getItem("theme-mode");
+    if (storedTheme === "light" || storedTheme === "dark") {
+      return storedTheme;
+    }
+  } catch {
+    // Use the default theme when storage is blocked.
   }
 
   return "dark";

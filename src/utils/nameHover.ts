@@ -4,11 +4,13 @@ import { prefersReducedMotion } from "./theme";
 const effects = ["sheen", "underline-center", "corners", "wave", "highlight-scan", "greeting", "confetti", "marker", "pixels"] as const;
 type NameEffect = (typeof effects)[number];
 type EffectCycle = { remaining: NameEffect[]; last?: NameEffect };
-const cycles = new WeakMap<HTMLAnchorElement, EffectCycle>();
-const runs = new WeakMap<HTMLAnchorElement, object>();
+type AnimationRun = { phase: "entering" | "active" | "exiting"; hovered: boolean };
+const cycles = new WeakMap<HTMLElement, EffectCycle>();
+const runs = new WeakMap<HTMLElement, AnimationRun>();
+const tapTimers = new WeakMap<HTMLElement, number>();
 const easing = "cubic-bezier(0.4, 0, 0.2, 1)";
 
-function nextEffect(link: HTMLAnchorElement): NameEffect {
+function nextEffect(link: HTMLElement): NameEffect {
   const cycle: EffectCycle = cycles.get(link) ?? { remaining: [] };
   if (cycle.remaining.length === 0) {
     cycle.remaining = [...effects];
@@ -28,12 +30,14 @@ function nextEffect(link: HTMLAnchorElement): NameEffect {
   return effect;
 }
 
-function getNameParts(link: HTMLAnchorElement) {
+function getNameParts(link: HTMLElement) {
   return link.querySelectorAll("[data-name-part]");
 }
 
-export function clearNameAnimation(link: HTMLAnchorElement) {
-  runs.set(link, {});
+export function clearNameAnimation(link: HTMLElement) {
+  window.clearTimeout(tapTimers.get(link));
+  tapTimers.delete(link);
+  runs.delete(link);
   getNameParts(link).forEach((part) => {
     part.getAnimations().forEach((animation) => animation.cancel());
   });
@@ -41,10 +45,21 @@ export function clearNameAnimation(link: HTMLAnchorElement) {
   delete link.dataset.nameLetterMode;
 }
 
-export function playNameAnimation(link: HTMLAnchorElement, selected: NameEffect) {
+function completeNameExit(link: HTMLElement, run: AnimationRun) {
+  if (runs.get(link) !== run) return;
+  delete link.dataset.nameLetterMode;
+  runs.delete(link);
+  if (run.hovered && link.isConnected) {
+    playNameAnimation(link, prefersReducedMotion() ? "underline-center" : nextEffect(link));
+  }
+}
+
+export function playNameAnimation(link: HTMLElement, selected: NameEffect) {
   clearNameAnimation(link);
   const reducedMotion = prefersReducedMotion();
   const effect = reducedMotion ? "underline-center" : selected;
+  const run: AnimationRun = { phase: reducedMotion ? "active" : "entering", hovered: true };
+  runs.set(link, run);
   link.dataset.hoverActive = "true";
   link.dataset.hoverEffect = selected;
 
@@ -79,14 +94,17 @@ export function playNameAnimation(link: HTMLAnchorElement, selected: NameEffect)
         ], 360, index * 55);
       });
       break;
-    case "highlight-scan":
+    case "highlight-scan": {
       highlight();
+      // Measure once; every animation frame can then use transforms only.
+      const scanDistance = link.getBoundingClientRect().width + 6;
       animate(".name-hover-scan", [
-        { left: "-3px", transform: "scaleY(0)", offset: 0 },
-        { left: "-3px", transform: "scaleY(1)", offset: 0.05 },
-        { left: "calc(100% + 3px)", transform: "scaleY(1)", offset: 1 },
+        { transform: "translateX(0) scaleY(0)", offset: 0 },
+        { transform: "translateX(0) scaleY(1)", offset: 0.05 },
+        { transform: `translateX(${scanDistance}px) scaleY(1)`, offset: 1 },
       ]);
       break;
+    }
     case "greeting":
       animate(".name-hover-greeting", [
         { transform: "translate(-4px, -50%) scale(0)" },
@@ -108,8 +126,8 @@ export function playNameAnimation(link: HTMLAnchorElement, selected: NameEffect)
       break;
     case "marker":
       animate(".name-hover-marker path", [
-        { strokeDashoffset: "100" },
-        { strokeDashoffset: "0" },
+        { strokeDashoffset: "100", opacity: 1 },
+        { strokeDashoffset: "0", opacity: 1 },
       ], 760);
       break;
     case "pixels":
@@ -134,84 +152,82 @@ export function playNameAnimation(link: HTMLAnchorElement, selected: NameEffect)
       });
       break;
   }
-  return Array.from(getNameParts(link)).flatMap((part) => part.getAnimations());
+  const animations = Array.from(getNameParts(link)).flatMap((part) => part.getAnimations());
+  // Include staggered parts so leaving early never cuts off the opening sequence.
+  void Promise.all(animations.map((animation) => animation.finished)).then(() => {
+    if (runs.get(link) !== run) return;
+    run.phase = "active";
+    if (!run.hovered) reverseNameAnimation(link);
+  }, () => {
+    // Clearing or replacing a run cancels its animations and their promises.
+  });
+  return animations;
 }
 
-export function reverseNameAnimation(link: HTMLAnchorElement) {
-  if (link.dataset.hoverActive !== "true") return;
+export function reverseNameAnimation(link: HTMLElement) {
+  const run = runs.get(link);
+  if (!run) return;
+  run.hovered = false;
+  if (run.phase !== "active") return;
+  run.phase = "exiting";
   delete link.dataset.hoverActive;
   const reducedMotion = prefersReducedMotion();
-  const run = runs.get(link);
+  // The pixel wave already clears its tiles during the opening sequence.
+  const skipExit = reducedMotion || link.dataset.hoverEffect === "pixels";
   const animations = Array.from(getNameParts(link)).flatMap((part) => part.getAnimations());
-  const retract = link.dataset.hoverEffect === "pixels" || link.dataset.hoverEffect === "wave";
-
-  if (!retract || reducedMotion) {
-    let remaining = animations.length;
-    const finish = (animation: Animation) => {
-      animation.cancel();
-      remaining -= 1;
-      if (remaining === 0 && runs.get(link) === run && link.dataset.hoverActive !== "true") {
-        delete link.dataset.nameLetterMode;
-      }
-    };
-    if (remaining === 0) delete link.dataset.nameLetterMode;
-    animations.forEach((animation) => {
-      if (reducedMotion || animation.effect?.getTiming().duration === 0) {
-        finish(animation);
-      } else {
-        animation.onfinish = () => finish(animation);
-        animation.reverse();
-      }
-    });
-    return animations.filter((animation) => animation.playState !== "idle");
-  }
-
   const exits: Animation[] = [];
   animations.forEach((animation) => {
-    const part = (animation.effect as KeyframeEffect).target;
-    if (!part) {
+    if (skipExit || animation.effect?.getTiming().duration === 0) {
       animation.cancel();
       return;
     }
-    const style = getComputedStyle(part);
-    const from: Keyframe = { transform: style.transform };
-    const to: Keyframe = {};
-    const pixel = part.matches(".name-hover-pixel");
-    if (pixel) {
-      // Cleared or not-yet-shown tiles must stay hidden on exit.
-      const matrix = new DOMMatrixReadOnly(style.transform);
-      if (Math.abs(matrix.a) < 0.001 && Math.abs(matrix.d) < 0.001) {
-        animation.cancel();
-        return;
-      }
-      to.transform = "scale(0)";
-    } else {
-      // Settle letters directly rather than repeating the wave in reverse.
-      to.transform = "none";
-      from.color = "var(--accent)";
-      to.color = "var(--text)";
-    }
-    animation.cancel();
-    const exit = part.animate([from, to], { duration: pixel ? 160 : 220, easing, fill: "both" });
-    exits.push(exit);
-    exit.onfinish = () => {
-      exit.cancel();
-      if (runs.get(link) === run && exits.every((item) => item.playState === "idle")) {
-        delete link.dataset.nameLetterMode;
-      }
-    };
+    // Reverse the entire sequence, including staggered letters, rather than
+    // replacing it with a shortened exit.
+    animation.reverse();
+    exits.push(animation);
   });
-  if (!exits.length) delete link.dataset.nameLetterMode;
+  if (!exits.length) {
+    completeNameExit(link, run);
+    return exits;
+  }
+  // Keep the run alive until every part finishes, independently of hover state.
+  void Promise.all(exits.map((animation) => animation.finished)).then(() => {
+    if (runs.get(link) !== run) return;
+    exits.forEach((animation) => animation.cancel());
+    completeNameExit(link, run);
+  }, () => {
+    // Explicit clearing invalidates the run and cancels its pending completion.
+  });
   return exits;
 }
 
-export function animateNameHover(event: SyntheticEvent<HTMLAnchorElement>) {
+export function animateNameHover(event: SyntheticEvent<HTMLElement>) {
   const link = event.currentTarget;
-  if (link.dataset.hoverActive === "true") return;
+  const run = runs.get(link);
+  if (run) {
+    // Re-entry records intent without replacing an opening or closing animation.
+    run.hovered = true;
+    return;
+  }
   playNameAnimation(link, prefersReducedMotion() ? "underline-center" : nextEffect(link));
 }
 
-export function resetNameHover(event: SyntheticEvent<HTMLAnchorElement>) {
+export function animateNameTap(event: SyntheticEvent<HTMLElement>) {
+  const link = event.currentTarget;
+  playNameAnimation(link, nextEffect(link));
+  if (prefersReducedMotion()) {
+    // Keep a static underline visible long enough to acknowledge the tap.
+    tapTimers.set(link, window.setTimeout(() => {
+      tapTimers.delete(link);
+      reverseNameAnimation(link);
+    }, 650));
+    return;
+  }
+  // A tap plays the full entrance and exit without waiting for a hover to end.
+  reverseNameAnimation(link);
+}
+
+export function resetNameHover(event: SyntheticEvent<HTMLElement>) {
   const link = event.currentTarget;
   if (link.matches(":hover, :focus-visible")) return;
   reverseNameAnimation(link);
